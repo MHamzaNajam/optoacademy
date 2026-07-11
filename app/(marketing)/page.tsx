@@ -12,8 +12,8 @@ export default function HomePage() {
         <section className="pt-20 pb-16 grid md:grid-cols-2 gap-12 items-center">
           <div>
             <p className="text-amber font-mono text-sm mb-4 tracking-wide">
-     DHA · MOH · HAAD · SCHFS · OMSB · NHRA EXAM PREP
-   </p>
+              DHA · MOH · HAAD · SCHFS · OMSB · NHRA EXAM PREP
+            </p>
             <h1 className="text-4xl md:text-5xl font-semibold text-ink leading-tight mb-6">
               Sharpen your prep until
               <br />
@@ -21,9 +21,9 @@ export default function HomePage() {
               <span className="text-teal">20/20</span> ready.
             </h1>
             <p className="text-slate text-lg mb-8 max-w-md">
-              Original mock exams built to the real DHA, MOH, and HAAD
-              blueprints — timed, scored, and reviewed the way the real
-              exam works.
+              Original mock exams built to the real DHA, MOH, HAAD, SCHFS,
+              OMSB, and NHRA blueprints — timed, scored, and reviewed the
+              way the real exam works.
             </p>
             <div className="flex gap-4">
               <Link
@@ -43,22 +43,21 @@ export default function HomePage() {
 
           {/* Snellen-chart signature element */}
           <div className="bg-ink rounded-md p-10 flex flex-col items-center justify-center gap-3 select-none">
-     <p style={{ fontSize: "34px" }} className="text-paper/95 font-mono tracking-widest text-center w-full">
-       DHA MOH HAAD
-     </p>
-     <p style={{ fontSize: "26px" }} className="text-paper/80 font-mono tracking-widest text-center w-full">
-       SCHFS OMSB NHRA
-     </p>
-     <p style={{ fontSize: "22px" }} className="text-paper/65 font-mono tracking-widest blur-[0.4px] text-center w-full">
-       MOCK EXAMS
-     </p>
-     <p style={{ fontSize: "16px" }} className="text-paper/45 font-mono tracking-widest blur-[1px] text-center w-full">
-       SCORE REPORTS
-     </p>
-     <p style={{ fontSize: "12px" }} className="text-paper/30 font-mono tracking-widest blur-[1.5px] text-center w-full">
-       OPTOACADEMY.COM
-     </p>
-   </div>
+            <p style={{ fontSize: "34px" }} className="text-paper/95 font-mono tracking-widest text-center w-full">
+              DHA MOH HAAD
+            </p>
+            <p style={{ fontSize: "26px" }} className="text-paper/80 font-mono tracking-widest text-center w-full">
+              SCHFS OMSB NHRA
+            </p>
+            <p style={{ fontSize: "22px" }} className="text-paper/65 font-mono tracking-widest blur-[0.4px] text-center w-full">
+              MOCK EXAMS
+            </p>
+            <p style={{ fontSize: "16px" }} className="text-paper/45 font-mono tracking-widest blur-[1px] text-center w-full">
+              SCORE REPORTS
+            </p>
+            <p style={{ fontSize: "12px" }} className="text-paper/30 font-mono tracking-widest blur-[1.5px] text-center w-full">
+              OPTOACADEMY.COM
+            </p>
           </div>
         </section>
 
