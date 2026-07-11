@@ -36,7 +36,8 @@ export default function LoginPage() {
             Sign up
           </a>
         </p>
-      </div>
-    </div>
-  );
-}
+         </div>
+       </div>
+     </div>
+   );
+   }
