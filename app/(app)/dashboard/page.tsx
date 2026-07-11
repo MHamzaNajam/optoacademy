@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabaseClient";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,7 +17,14 @@ export default function DashboardPage() {
         router.push("/login");
         return;
       }
-      setUserEmail(data.user.email ?? null);
+
+      const { data: profile } = await supabase
+        .from("users")
+        .select("name")
+        .eq("id", data.user.id)
+        .single();
+
+      setUserName(profile?.name ?? data.user.email ?? "there");
       setLoading(false);
     }
     checkUser();
@@ -54,7 +61,7 @@ export default function DashboardPage() {
             <span className="text-ink font-medium">Dashboard</span>
             <Link href="/practice/1">Practice</Link>
             <Link href="/mock-exam">Mock exam</Link>
-            <span className="text-slate/60">{userEmail}</span>
+            <span className="text-slate/60">{userName}</span>
             <button
               onClick={handleLogout}
               className="border border-line bg-white px-3 py-1.5 rounded-sm text-ink hover:border-slate transition"
@@ -66,7 +73,7 @@ export default function DashboardPage() {
       </header>
 
       <main className="max-w-5xl mx-auto px-6 py-10">
-        <h1 className="text-2xl font-semibold text-ink mb-8">Welcome back</h1>
+        <h1 className="text-2xl font-semibold text-ink mb-8">Welcome back, {userName}</h1>
 
         <div className="grid md:grid-cols-3 gap-4 mb-10">
           {stats.map((s) => (
