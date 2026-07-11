@@ -43,6 +43,10 @@ export default async function AdminPage() {
   const { data: attempts } = await supabaseAdmin
     .from("attempts")
     .select("user_id, score, exam_type, submitted_at");
+  const { data: inquiries } = await supabaseAdmin
+     .from("consultation_inquiries")
+     .select("*")
+     .order("created_at", { ascending: false });
 
   const totalUsers = users?.length ?? 0;
   const activeSubs = users?.filter((u: any) => u.subscriptions?.[0]?.status === "active").length ?? 0;
@@ -102,6 +106,60 @@ export default async function AdminPage() {
             </tbody>
           </table>
         </div>
+           <h2 className="text-lg font-semibold text-ink mt-12 mb-4">
+     Consultation inquiries {inquiries && inquiries.length > 0 && `(${inquiries.length})`}
+   </h2>
+
+   <div className="bg-white border border-line rounded-md overflow-hidden">
+     <table className="w-full text-sm">
+       <thead className="bg-mist text-left text-slate text-xs uppercase">
+         <tr>
+           <th className="px-4 py-3">Name</th>
+           <th className="px-4 py-3">Contact</th>
+           <th className="px-4 py-3">Exam</th>
+           <th className="px-4 py-3">Docs add-on</th>
+           <th className="px-4 py-3">Message</th>
+           <th className="px-4 py-3">Received</th>
+         </tr>
+       </thead>
+       <tbody>
+         {inquiries?.map((inq: any) => (
+           <tr key={inq.id} className="border-t border-line align-top">
+             <td className="px-4 py-3 text-ink whitespace-nowrap">{inq.name}</td>
+             <td className="px-4 py-3 text-slate">
+               <div>{inq.email}</div>
+               <div>{inq.phone}</div>
+             </td>
+             <td className="px-4 py-3">
+               <span className="text-xs font-medium bg-teal/10 text-teal px-2 py-1 rounded-sm">
+                 {inq.exam_type ?? "—"}
+               </span>
+             </td>
+             <td className="px-4 py-3">
+               {inq.wants_document_processing ? (
+                 <span className="text-xs font-medium bg-amber/10 text-amber px-2 py-1 rounded-sm">
+                   Yes
+                 </span>
+               ) : (
+                 <span className="text-slate text-xs">No</span>
+               )}
+             </td>
+             <td className="px-4 py-3 text-slate max-w-xs">{inq.message || "—"}</td>
+             <td className="px-4 py-3 text-slate whitespace-nowrap">
+               {new Date(inq.created_at).toLocaleDateString()}
+             </td>
+           </tr>
+         ))}
+         {(!inquiries || inquiries.length === 0) && (
+           <tr>
+             <td colSpan={6} className="px-4 py-8 text-center text-slate text-sm">
+               No consultation inquiries yet.
+             </td>
+           </tr>
+         )}
+       </tbody>
+     </table>
+   </div>
          </div>
        </div>
      </div>
