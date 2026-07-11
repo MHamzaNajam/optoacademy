@@ -57,8 +57,10 @@ export default function SignupPage() {
     router.push("/dashboard");
   }
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-mist px-6 py-10">
+return (
+       <div className="min-h-screen bg-mist">
+         <MiniHeader />
+         <div className="flex items-center justify-center px-6 py-10">
       <div className="w-full max-w-sm bg-white border border-line rounded-md p-8">
         <h1 className="text-xl font-semibold text-ink mb-1">Create your account</h1>
         <p className="text-sm text-slate mb-6">
@@ -144,7 +146,8 @@ export default function SignupPage() {
             Log in
           </a>
         </p>
-      </div>
-    </div>
-  );
-}
+         </div>
+       </div>
+     </div>
+   );
+   }
