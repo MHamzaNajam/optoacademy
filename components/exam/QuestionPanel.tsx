@@ -10,14 +10,14 @@ export type QuestionData = {
 };
 
 type Props = {
-  question: QuestionData;
-  selected: string | null;
-  flagged: boolean;
-  showExplanation: boolean;
-  onSelect: (letter: string) => void;
-  onToggleFlag: () => void;
-};
-
+     question: QuestionData;
+     selected: string | null;
+     flagged: boolean;
+     showExplanation: boolean;
+     userName: string;
+     onSelect: (letter: string) => void;
+     onToggleFlag: () => void;
+   };
 export default function QuestionPanel({
   question,
   selected,
