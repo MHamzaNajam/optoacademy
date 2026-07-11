@@ -11,6 +11,7 @@ const config: Config = {
      ink: "#12202E",       // primary navy (text/accents only now)
      paper: "#FFFFFF",     // pure white background
      mist: "#F7F8F9",      // very light gray for subtle section breaks
+      haze: "#E9EDF0",       // darker gray-blue for header/footer contrast
      amber: "#C77A3B",     // retinoscope amber accent
      teal: "#3C6E63",      // lens-coating teal accent
      slate: "#5C6B78",     // muted text
