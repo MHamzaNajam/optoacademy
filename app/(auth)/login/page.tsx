@@ -1,3 +1,4 @@
+import MiniHeader from "@/components/marketing/MiniHeader";
 export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-paper px-6">
