@@ -11,20 +11,32 @@ export default function Header() {
           </span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-8 text-sm text-slate">
-          <Link href="/exams/dha" className="hover:text-ink transition">
-            DHA
-          </Link>
-          <Link href="/exams/moh" className="hover:text-ink transition">
-            MOH
-          </Link>
-          <Link href="/exams/haad" className="hover:text-ink transition">
-            HAAD
-          </Link>
-          <Link href="/pricing" className="hover:text-ink transition">
-            Pricing
-          </Link>
-        </nav>
+        <nav className="hidden lg:flex items-center gap-6 text-sm text-slate">
+     <Link href="/exams/dha" className="hover:text-ink transition">
+       DHA
+     </Link>
+     <Link href="/exams/moh" className="hover:text-ink transition">
+       MOH
+     </Link>
+     <Link href="/exams/haad" className="hover:text-ink transition">
+       HAAD
+     </Link>
+     <Link href="/exams/schfs" className="hover:text-ink transition">
+       SCHFS
+     </Link>
+     <Link href="/exams/omsb" className="hover:text-ink transition">
+       OMSB
+     </Link>
+     <Link href="/exams/nhra" className="hover:text-ink transition">
+       NHRA
+     </Link>
+     <Link href="/pricing" className="hover:text-ink transition">
+       Pricing
+     </Link>
+     <Link href="/consultation" className="hover:text-ink transition">
+       1-on-1 Coaching
+     </Link>
+   </nav>
 
         <div className="flex items-center gap-3">
           <Link
