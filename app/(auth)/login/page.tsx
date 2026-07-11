@@ -3,7 +3,8 @@ export default function LoginPage() {
      return (
        <div className="min-h-screen bg-paper">
          <MiniHeader />
-         <div className="flex items-center justify-center px-6 py-16">      <div className="w-full max-w-sm bg-white border border-line rounded-md p-8">
+         <div className="flex items-center justify-center px-6 py-16">      
+        <div className="w-full max-w-sm bg-white border border-line rounded-md p-8">
         <h1 className="text-xl font-semibold text-ink mb-1">Log in</h1>
         <p className="text-sm text-slate mb-6">
           Welcome back to OptoAcademy.
