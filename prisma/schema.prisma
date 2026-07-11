@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String            @id @default(cuid())
+  email            String            @unique
+  name             String?
+  createdAt        DateTime          @default(now())
+  subscription     Subscription?
+  attempts         Attempt[]
+  flaggedQuestions FlaggedQuestion[]
+}
+
+model Subscription {
+  id               String    @id @default(cuid())
+  userId           String    @unique
+  user             User      @relation(fields: [userId], references: [id])
+  plan             Plan
+  status           String
+  stripeCustomerId String?
+  currentPeriodEnd DateTime?
+}
+
+model Domain {
+  id        String     @id @default(cuid())
+  name      String
+  examType  ExamType
+  questions Question[]
+}
+
+model Question {
+  id            String     @id @default(cuid())
+  domainId      String
+  domain        Domain     @relation(fields: [domainId], references: [id])
+  stem          String
+  optionA       String
+  optionB       String
+  optionC       String
+  optionD       String
+  optionE       String?
+  correctOption String
+  explanation   String
+  difficulty    Difficulty
+  examType      ExamType
+  createdAt     DateTime   @default(now())
+}
+
+model Attempt {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  examType    ExamType
+  mode        Mode
+  startedAt   DateTime  @default(now())
+  submittedAt DateTime?
+  score       Float?
+  answers     Answer[]
+}
+
+model Answer {
+  id           String  @id @default(cuid())
+  attemptId    String
+  attempt      Attempt @relation(fields: [attemptId], references: [id])
+  questionId   String
+  selected     String?
+  flagged      Boolean @default(false)
+  timeSpentSec Int?
+}
+
+model FlaggedQuestion {
+  id         String  @id @default(cuid())
+  userId     String
+  user       User    @relation(fields: [userId], references: [id])
+  questionId String
+  reason     String?
+}
+
+enum ExamType {
+  DHA
+  MOH
+  HAAD
+}
+
+enum Plan {
+  FREE
+  MONTH_1
+  MONTH_3
+  LIFETIME
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum Mode {
+  TIMED_MOCK
+  PRACTICE
+}
