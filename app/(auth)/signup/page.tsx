@@ -1,3 +1,4 @@
+import MiniHeader from "@/components/marketing/MiniHeader";
 "use client";
 
 import { useState } from "react";
