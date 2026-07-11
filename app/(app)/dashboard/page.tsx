@@ -1,28 +1,72 @@
-import Link from "next/link";
+"use client";
 
-const stats = [
-  { label: "Mock exams taken", value: "4" },
-  { label: "Average score", value: "71%" },
-  { label: "Weakest domain", value: "Ocular pharmacology" },
-];
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function checkUser() {
+      const { data } = await supabase.auth.getUser();
+      if (!data.user) {
+        router.push("/login");
+        return;
+      }
+      setUserEmail(data.user.email ?? null);
+      setLoading(false);
+    }
+    checkUser();
+  }, [router]);
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    router.push("/");
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-paper">
+        <p className="text-sm text-slate">Loading...</p>
+      </div>
+    );
+  }
+
+  const stats = [
+    { label: "Mock exams taken", value: "0" },
+    { label: "Average score", value: "—" },
+    { label: "Weakest domain", value: "—" },
+  ];
+
   return (
     <div className="min-h-screen bg-paper">
-      <header className="border-b border-line px-6 py-4 flex items-center justify-between">
-        <span className="font-semibold text-ink">OptoAcademy</span>
-        <nav className="flex gap-6 text-sm text-slate">
-          <Link href="/dashboard" className="text-ink font-medium">Dashboard</Link>
-          <Link href="/practice/1">Practice</Link>
-          <Link href="/mock-exam">Mock exam</Link>
-          <Link href="/account">Account</Link>
-        </nav>
+      <header className="border-b border-line bg-haze px-6 py-4">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-amber" />
+            <span className="font-semibold tracking-tight text-ink">OptoAcademy</span>
+          </Link>
+          <nav className="flex items-center gap-6 text-sm text-slate">
+            <span className="text-ink font-medium">Dashboard</span>
+            <Link href="/practice/1">Practice</Link>
+            <Link href="/mock-exam">Mock exam</Link>
+            <span className="text-slate/60">{userEmail}</span>
+            <button
+              onClick={handleLogout}
+              className="border border-line bg-white px-3 py-1.5 rounded-sm text-ink hover:border-slate transition"
+            >
+              Log out
+            </button>
+          </nav>
+        </div>
       </header>
 
       <main className="max-w-5xl mx-auto px-6 py-10">
-        <h1 className="text-2xl font-semibold text-ink mb-8">
-          Welcome back, Hamza
-        </h1>
+        <h1 className="text-2xl font-semibold text-ink mb-8">Welcome back</h1>
 
         <div className="grid md:grid-cols-3 gap-4 mb-10">
           {stats.map((s) => (
@@ -34,16 +78,10 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex gap-4">
-          <Link
-            href="/mock-exam/new"
-            className="bg-ink text-paper px-6 py-3 rounded-sm font-medium"
-          >
+          <Link href="/mock-exam/new" className="bg-ink text-paper px-6 py-3 rounded-sm font-medium">
             Start a timed mock exam
           </Link>
-          <Link
-            href="/practice/1"
-            className="border border-line px-6 py-3 rounded-sm font-medium text-ink"
-          >
+          <Link href="/practice/1" className="border border-line px-6 py-3 rounded-sm font-medium text-ink">
             Practice by domain
           </Link>
         </div>
