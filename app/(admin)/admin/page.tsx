@@ -9,6 +9,10 @@ async function login(formData: FormData) {
     cookies().set("admin_auth", "true", { httpOnly: true, maxAge: 60 * 60 * 8 });
   }
 }
+async function logout() {
+     "use server";
+     cookies().delete("admin_auth");
+   }
 
 export default async function AdminPage() {
   const isAuthed = cookies().get("admin_auth")?.value === "true";
