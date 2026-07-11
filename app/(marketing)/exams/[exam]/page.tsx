@@ -2,22 +2,37 @@ import Header from "@/components/marketing/Header";
 import Footer from "@/components/marketing/Footer";
 
 const EXAM_INFO: Record<string, { name: string; body: string; blueprint: string[] }> = {
-  dha: {
-    name: "DHA",
-    body: "Dubai Health Authority licensing exam for optometrists relocating to work in Dubai.",
-    blueprint: ["Ocular anatomy & physiology", "Refraction & optics", "Ocular disease & pathology", "Contact lenses", "Pharmacology", "Ethics & regulations"],
-  },
-  moh: {
-    name: "MOH",
-    body: "Ministry of Health and Prevention licensing exam covering the wider UAE.",
-    blueprint: ["General optometry practice", "Clinical procedures", "Ocular disease", "Low vision", "UAE health regulations"],
-  },
-  haad: {
-    name: "HAAD",
-    body: "Health Authority Abu Dhabi licensing exam for practicing in the Abu Dhabi emirate.",
-    blueprint: ["Clinical optometry", "Ocular pharmacology", "Patient management", "Abu Dhabi healthcare regulations"],
-  },
-};
+     dha: {
+       name: "DHA",
+       body: "Dubai Health Authority licensing exam for optometrists relocating to work in Dubai.",
+       blueprint: ["Clinical Visual Optics", "Ocular Anatomy & Physiology", "Binocular Vision", "Refraction", "Contact Lens", "Paediatric Optometry", "Geriatric Optometry", "Low Vision", "Electrophysiology of Vision"],
+     },
+     moh: {
+       name: "MOH",
+       body: "Ministry of Health and Prevention licensing exam covering the wider UAE.",
+       blueprint: ["Clinical Visual Optics", "Ocular Anatomy & Physiology", "Binocular Vision", "Refraction", "Contact Lens", "Paediatric Optometry", "Geriatric Optometry", "Low Vision", "Electrophysiology of Vision"],
+     },
+     haad: {
+       name: "HAAD",
+       body: "Health Authority Abu Dhabi licensing exam for practicing in the Abu Dhabi emirate.",
+       blueprint: ["Clinical Visual Optics", "Ocular Anatomy & Physiology", "Binocular Vision", "Refraction", "Contact Lens", "Paediatric Optometry", "Geriatric Optometry", "Low Vision", "Electrophysiology of Vision"],
+     },
+     schfs: {
+       name: "SCHFS",
+       body: "Saudi Commission for Health Specialties licensing exam for optometrists practicing in Saudi Arabia.",
+       blueprint: ["Clinical Visual Optics", "Ocular Anatomy & Physiology", "Binocular Vision", "Refraction", "Contact Lens", "Paediatric Optometry", "Geriatric Optometry", "Low Vision", "Electrophysiology of Vision"],
+     },
+     omsb: {
+       name: "OMSB",
+       body: "Oman Medical Specialty Board licensing exam for optometrists practicing in Oman.",
+       blueprint: ["Clinical Visual Optics", "Ocular Anatomy & Physiology", "Binocular Vision", "Refraction", "Contact Lens", "Paediatric Optometry", "Geriatric Optometry", "Low Vision", "Electrophysiology of Vision"],
+     },
+     nhra: {
+       name: "NHRA",
+       body: "National Health Regulatory Authority licensing exam for optometrists practicing in Bahrain.",
+       blueprint: ["Clinical Visual Optics", "Ocular Anatomy & Physiology", "Binocular Vision", "Refraction", "Contact Lens", "Paediatric Optometry", "Geriatric Optometry", "Low Vision", "Electrophysiology of Vision"],
+     },
+   };
 
 export default function ExamPage({ params }: { params: { exam: string } }) {
   const info = EXAM_INFO[params.exam] ?? EXAM_INFO.dha;
