@@ -4,12 +4,26 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
+const COUNTRY_CODES = [
+  { code: "+92", flag: "🇵🇰", name: "Pakistan" },
+  { code: "+971", flag: "🇦🇪", name: "UAE" },
+  { code: "+966", flag: "🇸🇦", name: "Saudi Arabia" },
+  { code: "+974", flag: "🇶🇦", name: "Qatar" },
+  { code: "+973", flag: "🇧🇭", name: "Bahrain" },
+  { code: "+968", flag: "🇴🇲", name: "Oman" },
+  { code: "+91", flag: "🇮🇳", name: "India" },
+  { code: "+880", flag: "🇧🇩", name: "Bangladesh" },
+  { code: "+44", flag: "🇬🇧", name: "United Kingdom" },
+  { code: "+1", flag: "🇺🇸", name: "United States" },
+];
+
 export default function SignupPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [mobileNumber, setMobileNumber] = useState("");
+  const [countryCode, setCountryCode] = useState("+92");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [instituteName, setInstituteName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -19,31 +33,24 @@ export default function SignupPage() {
     setError(null);
     setLoading(true);
 
-    const { data, error: signUpError } = await supabase.auth.signUp({
+    const fullMobileNumber = `${countryCode}${phoneNumber}`;
+
+    const { error: signUpError } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          name,
+          mobile_number: fullMobileNumber,
+          institute_name: instituteName,
+        },
+      },
     });
 
     if (signUpError) {
       setError(signUpError.message);
       setLoading(false);
       return;
-    }
-
-    if (data.user) {
-      const { error: insertError } = await supabase.from("users").insert({
-        id: data.user.id,
-        email,
-        name,
-        mobile_number: mobileNumber,
-        institute_name: instituteName,
-      });
-
-      if (insertError) {
-        setError(insertError.message);
-        setLoading(false);
-        return;
-      }
     }
 
     router.push("/dashboard");
@@ -83,14 +90,29 @@ export default function SignupPage() {
             onChange={(e) => setPassword(e.target.value)}
             className="border border-line rounded-sm px-3 py-2 text-sm"
           />
-          <input
-            type="tel"
-            placeholder="Mobile number"
-            required
-            value={mobileNumber}
-            onChange={(e) => setMobileNumber(e.target.value)}
-            className="border border-line rounded-sm px-3 py-2 text-sm"
-          />
+
+          <div className="flex gap-2">
+            <select
+              value={countryCode}
+              onChange={(e) => setCountryCode(e.target.value)}
+              className="border border-line rounded-sm px-2 py-2 text-sm bg-white w-[110px]"
+            >
+              {COUNTRY_CODES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.flag} {c.code}
+                </option>
+              ))}
+            </select>
+            <input
+              type="tel"
+              placeholder="Mobile number"
+              required
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value.replace(/[^0-9]/g, ""))}
+              className="border border-line rounded-sm px-3 py-2 text-sm flex-1"
+            />
+          </div>
+
           <input
             type="text"
             placeholder="Institute name"
