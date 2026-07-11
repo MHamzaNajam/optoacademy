@@ -19,13 +19,14 @@ type Props = {
      onToggleFlag: () => void;
    };
 export default function QuestionPanel({
-  question,
-  selected,
-  flagged,
-  showExplanation,
-  onSelect,
-  onToggleFlag,
-}: Props) {
+     question,
+     selected,
+     flagged,
+     showExplanation,
+     userName,
+     onSelect,
+     onToggleFlag,
+   }: Props) {
   return (
     <div className="flex-1 px-7 py-6 flex flex-col">
       <div className="flex items-center justify-between mb-4 pb-2.5 border-b border-line text-xs text-slate">
