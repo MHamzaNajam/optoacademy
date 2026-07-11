@@ -1,8 +1,24 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 
 export default function Header() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const navLinks = [
+    { href: "/exams/dha", label: "DHA" },
+    { href: "/exams/moh", label: "MOH" },
+    { href: "/exams/haad", label: "HAAD" },
+    { href: "/exams/schfs", label: "SCHFS" },
+    { href: "/exams/omsb", label: "OMSB" },
+    { href: "/exams/nhra", label: "NHRA" },
+    { href: "/pricing", label: "Pricing" },
+    { href: "/consultation", label: "1-on-1 Coaching" },
+  ];
+
   return (
-    <header className="border-b border-line bg-haze backdrop-blur sticky top-0 z-40">
+    <header className="border-b border-line bg-haze sticky top-0 z-40">
       <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-amber" />
@@ -12,37 +28,15 @@ export default function Header() {
         </Link>
 
         <nav className="hidden lg:flex items-center gap-6 text-sm text-slate">
-     <Link href="/exams/dha" className="hover:text-ink transition">
-       DHA
-     </Link>
-     <Link href="/exams/moh" className="hover:text-ink transition">
-       MOH
-     </Link>
-     <Link href="/exams/haad" className="hover:text-ink transition">
-       HAAD
-     </Link>
-     <Link href="/exams/schfs" className="hover:text-ink transition">
-       SCHFS
-     </Link>
-     <Link href="/exams/omsb" className="hover:text-ink transition">
-       OMSB
-     </Link>
-     <Link href="/exams/nhra" className="hover:text-ink transition">
-       NHRA
-     </Link>
-     <Link href="/pricing" className="hover:text-ink transition">
-       Pricing
-     </Link>
-     <Link href="/consultation" className="hover:text-ink transition">
-       1-on-1 Coaching
-     </Link>
-   </nav>
+          {navLinks.map((link) => (
+            <Link key={link.href} href={link.href} className="hover:text-ink transition">
+              {link.label}
+            </Link>
+          ))}
+        </nav>
 
-        <div className="flex items-center gap-3">
-          <Link
-            href="/login"
-            className="text-sm text-slate hover:text-ink transition"
-          >
+        <div className="hidden lg:flex items-center gap-3">
+          <Link href="/login" className="text-sm text-slate hover:text-ink transition">
             Log in
           </Link>
           <Link
@@ -52,7 +46,60 @@ export default function Header() {
             Start free
           </Link>
         </div>
+
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="lg:hidden flex flex-col justify-center gap-1.5 w-8 h-8"
+          aria-label="Toggle menu"
+        >
+          <span
+            className={`block h-0.5 w-6 bg-ink transition-transform ${
+              menuOpen ? "rotate-45 translate-y-2" : ""
+            }`}
+          />
+          <span
+            className={`block h-0.5 w-6 bg-ink transition-opacity ${
+              menuOpen ? "opacity-0" : ""
+            }`}
+          />
+          <span
+            className={`block h-0.5 w-6 bg-ink transition-transform ${
+              menuOpen ? "-rotate-45 -translate-y-2" : ""
+            }`}
+          />
+        </button>
       </div>
+
+      {menuOpen && (
+        <div className="lg:hidden border-t border-line bg-white px-6 py-4 flex flex-col gap-1">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setMenuOpen(false)}
+              className="py-2.5 text-sm text-ink border-b border-line"
+            >
+              {link.label}
+            </Link>
+          ))}
+          <div className="flex flex-col gap-2 pt-4">
+            <Link
+              href="/login"
+              onClick={() => setMenuOpen(false)}
+              className="text-sm text-center border border-line rounded-sm py-2.5 text-ink"
+            >
+              Log in
+            </Link>
+            <Link
+              href="/signup"
+              onClick={() => setMenuOpen(false)}
+              className="text-sm text-center font-medium bg-ink text-paper py-2.5 rounded-sm"
+            >
+              Start free
+            </Link>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
