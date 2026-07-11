@@ -1,3 +1,4 @@
+import MiniHeader from "@/components/marketing/MiniHeader";
 import { cookies } from "next/headers";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
@@ -13,8 +14,10 @@ export default async function AdminPage() {
   const isAuthed = cookies().get("admin_auth")?.value === "true";
 
   if (!isAuthed) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-mist">
+       return (
+         <div className="min-h-screen bg-mist">
+           <MiniHeader />
+           <div className="flex items-center justify-center py-16">
         <form action={login} className="bg-white border border-line rounded-md p-8 w-full max-w-sm">
           <h1 className="text-lg font-semibold text-ink mb-4">Admin access</h1>
           <input
@@ -27,9 +30,10 @@ export default async function AdminPage() {
             Enter
           </button>
         </form>
-      </div>
-    );
-  }
+         </div>
+       </div>
+     );
+   }
 
   const { data: users } = await supabaseAdmin
     .from("users")
@@ -43,9 +47,11 @@ export default async function AdminPage() {
   const totalUsers = users?.length ?? 0;
   const activeSubs = users?.filter((u: any) => u.subscriptions?.[0]?.status === "active").length ?? 0;
 
-  return (
-    <div className="min-h-screen bg-mist px-6 py-10">
-      <div className="max-w-6xl mx-auto">
+ return (
+       <div className="min-h-screen bg-mist">
+         <MiniHeader />
+         <div className="px-6 py-10">
+         <div className="max-w-6xl mx-auto">
         <div className="flex items-center gap-2 mb-8">
           <span className="w-2 h-2 rounded-full bg-amber" />
           <h1 className="text-2xl font-semibold text-ink">OptoAcademy admin</h1>
@@ -96,7 +102,8 @@ export default async function AdminPage() {
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
-  );
-}
+         </div>
+       </div>
+     </div>
+   );
+   }
