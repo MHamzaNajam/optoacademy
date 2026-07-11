@@ -43,21 +43,22 @@ export default function HomePage() {
 
           {/* Snellen-chart signature element */}
           <div className="bg-ink rounded-md p-10 flex flex-col items-center justify-center gap-3 select-none">
-            <p style={{ fontSize: "34px" }} className="text-paper/95 font-mono tracking-widest">
-     DHA MOH HAAD
-   </p>
-   <p style={{ fontSize: "26px" }} className="text-paper/80 font-mono tracking-widest">
-     SCHFS OMSB NHRA
-   </p>
-            <p style={{ fontSize: "22px" }} className="text-paper/65 font-mono tracking-widest blur-[0.4px]">
-              MOCK EXAMS
-            </p>
-            <p style={{ fontSize: "16px" }} className="text-paper/45 font-mono tracking-widest blur-[1px]">
-              SCORE REPORTS
-            </p>
-            <p style={{ fontSize: "12px" }} className="text-paper/30 font-mono tracking-widest blur-[1.5px]">
-              OPTOACADEMY.COM
-            </p>
+     <p style={{ fontSize: "34px" }} className="text-paper/95 font-mono tracking-widest text-center w-full">
+       DHA MOH HAAD
+     </p>
+     <p style={{ fontSize: "26px" }} className="text-paper/80 font-mono tracking-widest text-center w-full">
+       SCHFS OMSB NHRA
+     </p>
+     <p style={{ fontSize: "22px" }} className="text-paper/65 font-mono tracking-widest blur-[0.4px] text-center w-full">
+       MOCK EXAMS
+     </p>
+     <p style={{ fontSize: "16px" }} className="text-paper/45 font-mono tracking-widest blur-[1px] text-center w-full">
+       SCORE REPORTS
+     </p>
+     <p style={{ fontSize: "12px" }} className="text-paper/30 font-mono tracking-widest blur-[1.5px] text-center w-full">
+       OPTOACADEMY.COM
+     </p>
+   </div>
           </div>
         </section>
 
