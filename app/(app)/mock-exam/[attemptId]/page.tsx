@@ -77,13 +77,14 @@ export default function MockExamPage() {
             onSelect={setCurrent}
           />
           <QuestionPanel
-            question={question}
-            selected={selections[current] ?? null}
-            flagged={flagged.has(current)}
-            showExplanation={practiceMode}
-            onSelect={selectOption}
-            onToggleFlag={toggleFlag}
-          />
+     question={question}
+     selected={selections[current] ?? null}
+     flagged={flagged.has(current)}
+     showExplanation={practiceMode}
+     userName="Hamza M."
+     onSelect={selectOption}
+     onToggleFlag={toggleFlag}
+   />
         </div>
 
         {/* Footer toolbar */}
