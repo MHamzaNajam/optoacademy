@@ -77,13 +77,30 @@ export default function QuestionPanel({
       </div>
 
       {showExplanation && question.explanation && (
-        <div className="mt-5 p-4 bg-[#f4f6f8] border-l-[3px] border-teal text-sm leading-relaxed">
-          <p className="text-xs font-semibold uppercase tracking-wide text-teal mb-1">
-            Explanation
-          </p>
-          {question.explanation}
-        </div>
-      )}
+     <div
+       className="mt-5 p-4 bg-[#f4f6f8] border-l-[3px] border-teal text-sm leading-relaxed relative overflow-hidden select-none"
+       onContextMenu={(e) => e.preventDefault()}
+     >
+       <p className="text-xs font-semibold uppercase tracking-wide text-teal mb-1">
+         Explanation
+       </p>
+       {question.explanation}
+
+       <div
+         className="absolute inset-0 pointer-events-none flex flex-wrap content-around justify-around opacity-[0.08] overflow-hidden"
+         aria-hidden="true"
+       >
+         {Array.from({ length: 12 }).map((_, i) => (
+           <span
+             key={i}
+             className="text-ink text-xs font-medium whitespace-nowrap -rotate-12"
+           >
+             OptoAcademy · {userName}
+           </span>
+         ))}
+       </div>
+     </div>
+   )}
     </div>
   );
 }
