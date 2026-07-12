@@ -176,7 +176,7 @@ export default async function EditQuestionPage({ params }: { params: { id: strin
           >
             Save changes
           </button>
-          
+          <a
             href="/admin/questions"
             className="border border-line px-6 py-2.5 rounded-sm font-medium text-sm text-ink flex items-center"
           >
