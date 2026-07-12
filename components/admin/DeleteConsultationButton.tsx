@@ -1,6 +1,6 @@
 "use client";
 
-import { deleteInquiry } from "@/app/(admin)/admin/(protected)/consultations/page";
+import { deleteInquiry } from "@/app/(admin)/admin/(protected)/consultations/actions";
 
 export default function DeleteConsultationButton({ id, name }: { id: string; name: string }) {
   return (
