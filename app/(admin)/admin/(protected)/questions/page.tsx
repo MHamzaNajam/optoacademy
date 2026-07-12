@@ -34,7 +34,7 @@ export default async function QuestionsPage({
 
   // Domain counts (all questions are few enough to pull domain_id in one go)
   const { data: allDomainIds } = await supabaseAdmin.from("questions").select("domain_id");
-  const { data: domains } = await supabaseAdmin.from("domains").select("id, name, exam_type");
+  const { data: domains } = await supabaseAdmin.from("domains").select("id, name");
 
   const countMap: Record<string, number> = {};
   allDomainIds?.forEach((q: any) => {
@@ -43,7 +43,7 @@ export default async function QuestionsPage({
 
   const domainSummary = (domains || [])
     .map((d: any) => ({
-      label: `${d.name} · ${d.exam_type}`,
+      label: d.name,
       count: countMap[d.id] || 0,
     }))
     .filter((d) => d.count > 0)
@@ -66,7 +66,7 @@ export default async function QuestionsPage({
 
   const domainLookup: Record<string, string> = {};
   domains?.forEach((d: any) => {
-    domainLookup[d.id] = `${d.name} · ${d.exam_type}`;
+    domainLookup[d.id] = d.name;
   });
 
   const questions = (questionRows || []).map((q: any) => ({
