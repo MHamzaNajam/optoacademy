@@ -20,9 +20,15 @@ export default function DashboardPage() {
 
       const { data: profile } = await supabase
         .from("users")
-        .select("name")
+        .select("name, is_suspended")
         .eq("id", data.user.id)
         .single();
+
+      if (profile?.is_suspended) {
+        await supabase.auth.signOut();
+        router.push("/suspended");
+        return;
+      }
 
       setUserName(profile?.name ?? data.user.email ?? "there");
       setLoading(false);
