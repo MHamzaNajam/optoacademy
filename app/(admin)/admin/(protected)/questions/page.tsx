@@ -1,163 +1,138 @@
-"use client";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import QuestionsTable from "@/components/admin/QuestionsTable";
 
-import { useState } from "react";
-import Papa from "papaparse";
+const PAGE_SIZE = 25;
 
-const CHUNK_SIZE = 300;
+async function checkAccess() {
+  const cookieStore = cookies();
+  const adminId = cookieStore.get("admin_id")?.value;
+  if (!adminId) redirect("/admin");
 
-type UploadResult = {
-  insertedCount: number;
-  errorCount: number;
-  errors: { row: number; reason: string }[];
-};
+  const { data: adminRow } = await supabaseAdmin
+    .from("admin_users")
+    .select("role, can_manage_questions")
+    .eq("id", adminId)
+    .single();
 
-export default function QuestionsUploadPage() {
-  const [fileName, setFileName] = useState<string | null>(null);
-  const [totalRows, setTotalRows] = useState(0);
-  const [processedRows, setProcessedRows] = useState(0);
-  const [uploading, setUploading] = useState(false);
-  const [results, setResults] = useState<UploadResult | null>(null);
-  const [parseError, setParseError] = useState<string | null>(null);
+  if (!adminRow) redirect("/admin");
+  const allowed = adminRow.role === "super_admin" || adminRow.can_manage_questions;
+  if (!allowed) redirect("/admin/dashboard?error=noaccess");
+}
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+export default async function QuestionsPage({
+  searchParams,
+}: {
+  searchParams: { page?: string; search?: string };
+}) {
+  await checkAccess();
 
-    setFileName(file.name);
-    setResults(null);
-    setParseError(null);
-    setProcessedRows(0);
+  const page = Math.max(1, parseInt(searchParams.page || "1", 10) || 1);
+  const search = searchParams.search?.trim() || "";
 
-    Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
-      complete: async (parsed) => {
-        const rows = parsed.data as any[];
-        if (rows.length === 0) {
-          setParseError("No rows found in this file.");
-          return;
-        }
-        setTotalRows(rows.length);
-        await uploadInChunks(rows);
-      },
-      error: (err) => {
-        setParseError(`Could not read file: ${err.message}`);
-      },
-    });
+  // Domain counts (all questions are few enough to pull domain_id in one go)
+  const { data: allDomainIds } = await supabaseAdmin.from("questions").select("domain_id");
+  const { data: domains } = await supabaseAdmin.from("domains").select("id, name, exam_type");
+
+  const countMap: Record<string, number> = {};
+  allDomainIds?.forEach((q: any) => {
+    countMap[q.domain_id] = (countMap[q.domain_id] || 0) + 1;
+  });
+
+  const domainSummary = (domains || [])
+    .map((d: any) => ({
+      label: `${d.name} · ${d.exam_type}`,
+      count: countMap[d.id] || 0,
+    }))
+    .filter((d) => d.count > 0)
+    .sort((a, b) => b.count - a.count);
+
+  const totalQuestions = allDomainIds?.length || 0;
+
+  // Paginated, searchable question list
+  let query = supabaseAdmin
+    .from("questions")
+    .select("id, stem, correct_option, difficulty, is_active, domain_id", { count: "exact" })
+    .order("created_at", { ascending: false })
+    .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
+
+  if (search) {
+    query = query.ilike("stem", `%${search}%`);
   }
 
-  async function uploadInChunks(rows: any[]) {
-    setUploading(true);
-    let totalInserted = 0;
-    let allErrors: { row: number; reason: string }[] = [];
+  const { data: questionRows, count } = await query;
 
-    for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
-      const chunk = rows.slice(i, i + CHUNK_SIZE);
+  const domainLookup: Record<string, string> = {};
+  domains?.forEach((d: any) => {
+    domainLookup[d.id] = `${d.name} · ${d.exam_type}`;
+  });
 
-      try {
-        const res = await fetch("/api/admin/questions/bulk-upload", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ rows: chunk }),
-        });
+  const questions = (questionRows || []).map((q: any) => ({
+    ...q,
+    domainLabel: domainLookup[q.domain_id] || "Unknown",
+  }));
 
-        const data = await res.json();
-
-        if (!res.ok) {
-          allErrors.push({ row: i + 1, reason: data.error || "Unknown server error" });
-        } else {
-          totalInserted += data.insertedCount;
-          const offsetErrors = (data.errors || []).map((e: any) => ({
-            row: e.row + i,
-            reason: e.reason,
-          }));
-          allErrors = allErrors.concat(offsetErrors);
-        }
-      } catch (err: any) {
-        allErrors.push({ row: i + 1, reason: `Network error: ${err.message}` });
-      }
-
-      setProcessedRows(Math.min(i + CHUNK_SIZE, rows.length));
-    }
-
-    setResults({
-      insertedCount: totalInserted,
-      errorCount: allErrors.length,
-      errors: allErrors,
-    });
-    setUploading(false);
-  }
+  const totalPages = Math.max(1, Math.ceil((count || 0) / PAGE_SIZE));
 
   return (
-    <div className="max-w-4xl">
-      <h1 className="text-2xl font-semibold text-ink mb-2">Bulk upload questions</h1>
-      <p className="text-sm text-slate mb-8">
-        Upload a CSV file of questions. Works for 10 questions or 10,000 — large
-        files are processed in batches automatically.
-      </p>
-
-      <div className="bg-white border border-line rounded-md p-6 mb-6">
-        <h2 className="text-sm font-semibold text-ink mb-3">Template rules</h2>
-        <ul className="text-xs text-slate space-y-1.5 list-disc list-inside">
-          <li><strong>domain_name</strong> must exactly match one of your 9 domains</li>
-          <li><strong>option_e</strong> can be left blank for 4-option questions</li>
-          <li><strong>correct_option</strong> must be a single letter, A through E</li>
-          <li><strong>difficulty</strong> must be EASY, MEDIUM, or HARD</li>
-          <li><strong>is_trial</strong> must be TRUE or FALSE</li>
-        </ul>
+    <div className="max-w-6xl">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-semibold text-ink">
+          Questions {totalQuestions > 0 && `(${totalQuestions})`}
+        </h1>
+        <Link
+          href="/admin/questions/bulk-upload"
+          className="text-sm border border-line bg-white px-4 py-2 rounded-sm text-ink hover:border-slate transition"
+        >
+          Bulk upload
+        </Link>
       </div>
 
-      <div className="bg-white border border-line rounded-md p-6">
-        <label className="block text-sm font-medium text-ink mb-3">
-          Choose a CSV file
-        </label>
+      <div className="grid md:grid-cols-3 gap-3 mb-8">
+        {domainSummary.map((d) => (
+          <div key={d.label} className="bg-white border border-line rounded-md p-4">
+            <p className="text-xs text-slate mb-1">{d.label}</p>
+            <p className="text-xl font-semibold text-ink">{d.count}</p>
+          </div>
+        ))}
+        {domainSummary.length === 0 && (
+          <p className="text-sm text-slate col-span-3">No questions yet.</p>
+        )}
+      </div>
+
+      <form className="mb-4" method="GET">
         <input
-          type="file"
-          accept=".csv"
-          onChange={handleFileChange}
-          disabled={uploading}
-          className="text-sm"
+          type="text"
+          name="search"
+          defaultValue={search}
+          placeholder="Search question text..."
+          className="border border-line rounded-sm px-3 py-2 text-sm w-full max-w-sm"
         />
+      </form>
 
-        {fileName && (
-          <p className="text-xs text-slate mt-3">Selected: {fileName}</p>
+      <QuestionsTable questions={questions} page={page} />
+
+      <div className="flex items-center gap-3 mt-6">
+        {page > 1 && (
+          <Link
+            href={`/admin/questions?page=${page - 1}${search ? `&search=${encodeURIComponent(search)}` : ""}`}
+            className="text-xs border border-line px-3 py-1.5 rounded-sm hover:bg-mist transition"
+          >
+            Previous
+          </Link>
         )}
-
-        {parseError && (
-          <p className="text-xs text-[#c0392b] bg-[#c0392b]/5 border border-[#c0392b]/20 rounded-sm px-3 py-2 mt-3">
-            {parseError}
-          </p>
-        )}
-
-        {uploading && (
-          <div className="mt-4">
-            <div className="w-full bg-mist rounded-full h-2 overflow-hidden">
-              <div
-                className="bg-teal h-2 transition-all"
-                style={{ width: `${(processedRows / totalRows) * 100}%` }}
-              />
-            </div>
-            <p className="text-xs text-slate mt-2">
-              Processing {processedRows} of {totalRows} rows...
-            </p>
-          </div>
-        )}
-
-        {results && (
-          <div className="mt-6 border-t border-line pt-4">
-            <p className="text-sm font-medium text-ink mb-1">
-              Upload complete: {results.insertedCount} added, {results.errorCount} skipped
-            </p>
-            {results.errorCount > 0 && (
-              <div className="mt-3 max-h-64 overflow-y-auto bg-mist rounded-sm p-3">
-                {results.errors.map((e, i) => (
-                  <p key={i} className="text-xs text-[#c0392b] mb-1">
-                    Row {e.row}: {e.reason}
-                  </p>
-                ))}
-              </div>
-            )}
-          </div>
+        <span className="text-xs text-slate">
+          Page {page} of {totalPages}
+        </span>
+        {page < totalPages && (
+          <Link
+            href={`/admin/questions?page=${page + 1}${search ? `&search=${encodeURIComponent(search)}` : ""}`}
+            className="text-xs border border-line px-3 py-1.5 rounded-sm hover:bg-mist transition"
+          >
+            Next
+          </Link>
         )}
       </div>
     </div>
