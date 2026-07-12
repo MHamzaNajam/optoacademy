@@ -30,3 +30,42 @@ export async function deleteQuestion(formData: FormData) {
 
   redirect(`/admin/questions?page=${page || "1"}`);
 }
+
+export async function updateQuestion(formData: FormData) {
+  await checkPermission();
+
+  const id = formData.get("id") as string;
+  const domain_id = formData.get("domain_id") as string;
+  const stem = formData.get("stem") as string;
+  const option_a = formData.get("option_a") as string;
+  const option_b = formData.get("option_b") as string;
+  const option_c = formData.get("option_c") as string;
+  const option_d = formData.get("option_d") as string;
+  const option_e = formData.get("option_e") as string;
+  const correct_option = formData.get("correct_option") as string;
+  const explanation = formData.get("explanation") as string;
+  const difficulty = formData.get("difficulty") as string;
+  const is_active = formData.get("is_active") === "on";
+  const is_trial = formData.get("is_trial") === "on";
+
+  await supabaseAdmin
+    .from("questions")
+    .update({
+      domain_id,
+      stem,
+      option_a,
+      option_b,
+      option_c,
+      option_d: option_d || null,
+      option_e: option_e || null,
+      correct_option,
+      explanation,
+      difficulty,
+      is_active,
+      is_trial,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id);
+
+  redirect("/admin/questions?success=updated");
+}
