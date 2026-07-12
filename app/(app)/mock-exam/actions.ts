@@ -27,7 +27,6 @@ export async function startMockExam(formData: FormData) {
 
   if (!template) throw new Error("Exam template not found");
 
-  // Check for a per-candidate custom weighting; fall back to global default
   const { data: customWeights } = await supabaseAdmin
     .from("user_domain_weights")
     .select("domain_id, weight_percentage")
@@ -43,46 +42,74 @@ export async function startMockExam(formData: FormData) {
       : (domains ?? []).map((d) => [d.id, d.weight_percentage]))
   );
 
-  // Work out how many questions to pull from each domain
   const totalQuestions = template.question_count;
-  const domainQuotas: { domainId: string; count: number }[] = [];
-  let allocated = 0;
-
   const domainList = domains ?? [];
-  domainList.forEach((d, idx) => {
-    const weight = weightMap.get(d.id) ?? 0;
-    const isLast = idx === domainList.length - 1;
-    const count = isLast
-      ? totalQuestions - allocated // last domain absorbs any rounding remainder
-      : Math.round((weight / 100) * totalQuestions);
-    allocated += count;
-    domainQuotas.push({ domainId: d.id, count: Math.max(0, count) });
-  });
 
-  // Pull randomly selected active questions per domain
-  let selectedQuestionIds: string[] = [];
-
-  for (const quota of domainQuotas) {
-    if (quota.count <= 0) continue;
-
+  // Fetch and shuffle available active question pools per domain up front
+  const poolByDomain = new Map<string, string[]>();
+  for (const d of domainList) {
     const { data: domainQuestions } = await supabaseAdmin
       .from("questions")
       .select("id")
-      .eq("domain_id", quota.domainId)
+      .eq("domain_id", d.id)
       .eq("is_active", true);
-
-    const pool = shuffle(domainQuestions ?? []);
-    const picked = pool.slice(0, quota.count).map((q) => q.id);
-    selectedQuestionIds = selectedQuestionIds.concat(picked);
+    poolByDomain.set(d.id, shuffle((domainQuestions ?? []).map((q) => q.id)));
   }
 
+  // Initial quota per domain, based on weight
+  let allocated = 0;
+  const quotas: { domainId: string; quota: number }[] = [];
+  domainList.forEach((d, idx) => {
+    const weight = weightMap.get(d.id) ?? 0;
+    const isLast = idx === domainList.length - 1;
+    const quota = isLast ? totalQuestions - allocated : Math.round((weight / 100) * totalQuestions);
+    allocated += quota;
+    quotas.push({ domainId: d.id, quota: Math.max(0, quota) });
+  });
+
+  // Take what's actually available per domain, track shortfall
+  const taken = new Map<string, number>();
+  let shortfall = 0;
+
+  for (const q of quotas) {
+    const pool = poolByDomain.get(q.domainId) ?? [];
+    const available = pool.length;
+    const actualTake = Math.min(q.quota, available);
+    taken.set(q.domainId, actualTake);
+    shortfall += q.quota - actualTake;
+  }
+
+  // Redistribute shortfall round-robin across domains with remaining capacity
+  if (shortfall > 0) {
+    let progress = true;
+    while (shortfall > 0 && progress) {
+      progress = false;
+      for (const d of domainList) {
+        if (shortfall <= 0) break;
+        const pool = poolByDomain.get(d.id) ?? [];
+        const currentlyTaken = taken.get(d.id) ?? 0;
+        if (currentlyTaken < pool.length) {
+          taken.set(d.id, currentlyTaken + 1);
+          shortfall -= 1;
+          progress = true;
+        }
+      }
+    }
+  }
+
+  // Assemble final question set
+  let selectedQuestionIds: string[] = [];
+  for (const d of domainList) {
+    const count = taken.get(d.id) ?? 0;
+    const pool = poolByDomain.get(d.id) ?? [];
+    selectedQuestionIds = selectedQuestionIds.concat(pool.slice(0, count));
+  }
   selectedQuestionIds = shuffle(selectedQuestionIds);
 
   if (selectedQuestionIds.length === 0) {
     throw new Error("No questions available yet for this exam. Please check back soon.");
   }
 
-  // Create the attempt
   const { data: attempt, error: attemptError } = await supabaseAdmin
     .from("attempts")
     .insert({
@@ -95,8 +122,7 @@ export async function startMockExam(formData: FormData) {
 
   if (attemptError || !attempt) throw new Error("Could not start exam attempt");
 
-  // Create a blank answer row per selected question, preserving order
-  const answerRows = selectedQuestionIds.map((qId, idx) => ({
+  const answerRows = selectedQuestionIds.map((qId) => ({
     attempt_id: attempt.id,
     question_id: qId,
     selected: null,
