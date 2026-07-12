@@ -1,11 +1,12 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { updateStatus } from "./actions";
 import DeleteConsultationButton from "@/components/admin/DeleteConsultationButton";
 
 const STATUS_OPTIONS = ["new", "contacted", "converted", "closed"];
 
-async function checkPermission() {
+async function checkAccess() {
   const cookieStore = cookies();
   const adminId = cookieStore.get("admin_id")?.value;
   if (!adminId) redirect("/admin");
@@ -21,37 +22,8 @@ async function checkPermission() {
   if (!allowed) redirect("/admin/dashboard?error=noaccess");
 }
 
-async function updateStatus(formData: FormData) {
-  "use server";
-  await checkPermission();
-
-  const id = formData.get("id") as string;
-  const status = formData.get("status") as string;
-
-  await supabaseAdmin
-    .from("consultation_inquiries")
-    .update({ status })
-    .eq("id", id);
-
-  redirect("/admin/consultations");
-}
-
-export async function deleteInquiry(formData: FormData) {
-  "use server";
-  await checkPermission();
-
-  const id = formData.get("id") as string;
-
-  await supabaseAdmin
-    .from("consultation_inquiries")
-    .delete()
-    .eq("id", id);
-
-  redirect("/admin/consultations");
-}
-
 export default async function ConsultationsPage() {
-  await checkPermission();
+  await checkAccess();
 
   const { data: inquiries } = await supabaseAdmin
     .from("consultation_inquiries")
