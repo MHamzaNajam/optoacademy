@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabaseServer";
+import { createClient } from "@supabase/supabase-js";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import MiniHeader from "@/components/marketing/MiniHeader";
 
@@ -10,8 +10,15 @@ async function login(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  const supabase = createSupabaseServerClient();
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  // Stateless client used only to verify the password — no session/cookie persistence needed,
+  // since the admin panel uses its own separate cookie system below.
+  const authClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { auth: { persistSession: false } }
+  );
+
+  const { data, error } = await authClient.auth.signInWithPassword({ email, password });
 
   if (error || !data.user) {
     redirect("/admin?error=invalid");
