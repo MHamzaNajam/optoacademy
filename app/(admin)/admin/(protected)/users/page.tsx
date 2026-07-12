@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { toggleSuspend, updateSubscription } from "./actions";
 
@@ -46,6 +47,7 @@ export default async function UsersPage() {
               <th className="px-4 py-3">Joined</th>
               <th className="px-4 py-3">Subscription</th>
               <th className="px-4 py-3">Account status</th>
+              <th className="px-4 py-3">Mock exam settings</th>
             </tr>
           </thead>
           <tbody>
@@ -114,12 +116,20 @@ export default async function UsersPage() {
                       </button>
                     </form>
                   </td>
+                  <td className="px-4 py-3">
+                    <Link
+                      href={`/admin/users/weights?userId=${u.id}`}
+                      className="text-xs border border-line px-2 py-1 rounded-sm hover:bg-mist transition text-ink"
+                    >
+                      Custom weighting
+                    </Link>
+                  </td>
                 </tr>
               );
             })}
             {(!users || users.length === 0) && (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-slate text-sm">
+                <td colSpan={7} className="px-4 py-8 text-center text-slate text-sm">
                   No users yet.
                 </td>
               </tr>
