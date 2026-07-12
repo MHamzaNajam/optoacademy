@@ -12,6 +12,21 @@ export function createSupabaseServerClient() {
         get(name: string) {
           return cookieStore.get(name)?.value;
         },
+        set(name: string, value: string, options: any) {
+          try {
+            cookieStore.set({ name, value, ...options });
+          } catch {
+            // Called from a context where cookies can't be set (e.g. a Server Component render).
+            // Safe to ignore here since our auth-writing calls happen in Server Actions/Route Handlers.
+          }
+        },
+        remove(name: string, options: any) {
+          try {
+            cookieStore.set({ name, value: "", ...options });
+          } catch {
+            // Same as above — safe to ignore outside a writable context.
+          }
+        },
       },
     }
   );
