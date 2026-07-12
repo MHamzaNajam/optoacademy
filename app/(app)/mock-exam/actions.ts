@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 function shuffle<T>(array: T[]): T[] {
@@ -16,7 +16,8 @@ function shuffle<T>(array: T[]): T[] {
 export async function startMockExam(formData: FormData) {
   const templateId = formData.get("templateId") as string;
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const supabase = createSupabaseServerClient();
+const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
   const { data: template } = await supabaseAdmin
