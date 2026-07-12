@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { deleteQuestion } from "@/app/(admin)/admin/(protected)/questions/actions";
 
 type Question = {
@@ -87,6 +88,7 @@ export default function QuestionsTable({
               <th className="px-4 py-3">Answer</th>
               <th className="px-4 py-3">Difficulty</th>
               <th className="px-4 py-3">Active</th>
+              <th className="px-4 py-3">Edit</th>
               <th className="px-4 py-3">Delete</th>
             </tr>
           </thead>
@@ -117,6 +119,14 @@ export default function QuestionsTable({
                   )}
                 </td>
                 <td className="px-4 py-3">
+                  <Link
+                    href={`/admin/questions/${q.id}/edit`}
+                    className="text-xs border border-line px-2 py-1 rounded-sm hover:bg-mist transition text-ink"
+                  >
+                    Edit
+                  </Link>
+                </td>
+                <td className="px-4 py-3">
                   <form action={deleteQuestion}>
                     <input type="hidden" name="id" value={q.id} />
                     <input type="hidden" name="page" value={page} />
@@ -132,7 +142,7 @@ export default function QuestionsTable({
             ))}
             {questions.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-slate text-sm">
+                <td colSpan={8} className="px-4 py-8 text-center text-slate text-sm">
                   No questions match.
                 </td>
               </tr>
