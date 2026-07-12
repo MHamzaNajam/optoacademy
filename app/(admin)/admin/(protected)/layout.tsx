@@ -1,7 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 async function logout() {
@@ -10,8 +9,6 @@ async function logout() {
   cookieStore.delete("admin_auth");
   cookieStore.delete("admin_id");
   cookieStore.delete("admin_role");
-  const supabase = createSupabaseServerClient();
-  await supabase.auth.signOut();
   redirect("/admin");
 }
 
