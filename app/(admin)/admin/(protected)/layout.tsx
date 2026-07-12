@@ -42,6 +42,7 @@ export default async function ProtectedAdminLayout({
   const navItems = [
     { href: "/admin/dashboard", label: "Dashboard", show: isSuperAdmin || adminRow.can_view_analytics },
     { href: "/admin/questions", label: "Questions", show: isSuperAdmin || adminRow.can_manage_questions },
+    { href: "/admin/domains", label: "Domain Weighting", show: isSuperAdmin || adminRow.can_manage_questions },
     { href: "/admin/users", label: "Users", show: isSuperAdmin || adminRow.can_manage_users },
     { href: "/admin/consultations", label: "Consultations", show: isSuperAdmin || adminRow.can_manage_consultations },
     { href: "/admin/blog", label: "Blog", show: isSuperAdmin || adminRow.can_manage_blog },
