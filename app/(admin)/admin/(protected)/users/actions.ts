@@ -60,3 +60,13 @@ export async function updateSubscription(formData: FormData) {
 
   redirect("/admin/users");
 }
+export async function deleteUser(formData: FormData) {
+  await checkPermission();
+
+  const userId = formData.get("userId") as string;
+
+  // Deleting the Supabase Auth user cascades to remove their row in the users table too
+  await supabaseAdmin.auth.admin.deleteUser(userId);
+
+  redirect("/admin/users");
+}
