@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
+import InactivityLogout from "@/components/InactivityLogout";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -57,6 +58,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-paper">
+      <InactivityLogout />
       <header className="border-b border-line bg-haze px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
