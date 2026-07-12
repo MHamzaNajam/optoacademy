@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { supabase } from "@/lib/supabaseClient";
+import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 async function logout() {
@@ -10,6 +10,7 @@ async function logout() {
   cookieStore.delete("admin_auth");
   cookieStore.delete("admin_id");
   cookieStore.delete("admin_role");
+  const supabase = createSupabaseServerClient();
   await supabase.auth.signOut();
   redirect("/admin");
 }
@@ -29,7 +30,7 @@ export default async function ProtectedAdminLayout({
 
   const { data: adminRow } = await supabaseAdmin
     .from("admin_users")
-    .select("email, role, can_manage_questions, can_manage_users, can_manage_consultations, can_manage_blog, can_view_analytics")
+    .select("email, name, role, can_manage_questions, can_manage_users, can_manage_consultations, can_manage_blog, can_view_analytics")
     .eq("id", adminId)
     .single();
 
@@ -42,7 +43,6 @@ export default async function ProtectedAdminLayout({
   const navItems = [
     { href: "/admin/dashboard", label: "Dashboard", show: isSuperAdmin || adminRow.can_view_analytics },
     { href: "/admin/questions", label: "Questions", show: isSuperAdmin || adminRow.can_manage_questions },
-    { href: "/admin/domains", label: "Domain Weighting", show: isSuperAdmin || adminRow.can_manage_questions },
     { href: "/admin/users", label: "Users", show: isSuperAdmin || adminRow.can_manage_users },
     { href: "/admin/consultations", label: "Consultations", show: isSuperAdmin || adminRow.can_manage_consultations },
     { href: "/admin/blog", label: "Blog", show: isSuperAdmin || adminRow.can_manage_blog },
@@ -70,7 +70,7 @@ export default async function ProtectedAdminLayout({
         </div>
         <div>
           <p className="text-xs text-white/60 mb-2">
-            {adminRow.email} · {isSuperAdmin ? "Super Admin" : "Admin"}
+            {adminRow.name || adminRow.email} · {isSuperAdmin ? "Super Admin" : "Admin"}
           </p>
           <form action={logout}>
             <button
