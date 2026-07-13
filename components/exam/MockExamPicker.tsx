@@ -1,6 +1,7 @@
 "use client";
-import { useFormStatus } from "react-dom";
+
 import { useState } from "react";
+import { useFormStatus } from "react-dom";
 import { startMockExam } from "@/app/(app)/mock-exam/actions";
 
 type Template = {
@@ -20,6 +21,22 @@ const LEVEL_LABELS: Record<string, string> = {
   HALF_MOCK: "Half-Length Mock",
   QUICK_PRACTICE: "Quick Practice",
 };
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="bg-ink text-paper px-6 py-3 rounded-sm font-medium text-sm disabled:opacity-50 w-full sm:w-auto flex items-center justify-center gap-2"
+    >
+      {pending && (
+        <span className="w-2 h-2 rounded-full bg-amber animate-pulse" />
+      )}
+      {pending ? "Starting exam..." : "Start exam"}
+    </button>
+  );
+}
 
 export default function MockExamPicker({ templates }: { templates: Template[] }) {
   const [examType, setExamType] = useState(EXAM_TYPES[0]);
@@ -77,13 +94,7 @@ export default function MockExamPicker({ templates }: { templates: Template[] })
 
       <form action={startMockExam}>
         <input type="hidden" name="templateId" value={selectedTemplateId} />
-        <button
-          type="submit"
-          disabled={!selectedTemplateId}
-          className="bg-ink text-paper px-6 py-3 rounded-sm font-medium text-sm disabled:opacity-50 w-full sm:w-auto"
-        >
-          Start exam
-        </button>
+        <SubmitButton />
       </form>
     </div>
   );
