@@ -95,10 +95,9 @@ export default function DashboardPage() {
         <div className="flex gap-4">
           <Link href="/mock-exam/new" className="bg-ink text-paper px-6 py-3 rounded-sm font-medium">
             Start a timed mock exam
-          </Link>
-          <Link href="/practice/1" className="border border-line px-6 py-3 rounded-sm font-medium text-ink">
-            Practice by domain
-          </Link>
+          </Link><Link href="/practice" className="border border-line px-6 py-3 rounded-sm font-medium text-ink">
+  Practice by domain
+</Link>
         </div>
       </main>
     </div>
