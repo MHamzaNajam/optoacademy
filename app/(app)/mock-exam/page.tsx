@@ -1,11 +1,12 @@
 import { redirect } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { startMockExam } from "./actions";
 import Link from "next/link";
 
 export default async function MockExamSetupPage() {
-  const { data: { user } } = await supabase.auth.getUser();
+  const supabase = createSupabaseServerClient();
+const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
   const { data: templates } = await supabaseAdmin
