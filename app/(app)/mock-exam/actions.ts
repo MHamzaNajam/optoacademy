@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 function shuffle<T>(array: T[]): T[] {
@@ -16,6 +16,7 @@ function shuffle<T>(array: T[]): T[] {
 export async function startMockExam(formData: FormData) {
   const templateId = formData.get("templateId") as string;
 
+  const supabase = createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
@@ -45,7 +46,6 @@ export async function startMockExam(formData: FormData) {
   const totalQuestions = template.question_count;
   const domainList = domains ?? [];
 
-  // Fetch and shuffle available active question pools per domain up front
   const poolByDomain = new Map<string, string[]>();
   for (const d of domainList) {
     const { data: domainQuestions } = await supabaseAdmin
@@ -56,7 +56,6 @@ export async function startMockExam(formData: FormData) {
     poolByDomain.set(d.id, shuffle((domainQuestions ?? []).map((q) => q.id)));
   }
 
-  // Initial quota per domain, based on weight
   let allocated = 0;
   const quotas: { domainId: string; quota: number }[] = [];
   domainList.forEach((d, idx) => {
@@ -67,7 +66,6 @@ export async function startMockExam(formData: FormData) {
     quotas.push({ domainId: d.id, quota: Math.max(0, quota) });
   });
 
-  // Take what's actually available per domain, track shortfall
   const taken = new Map<string, number>();
   let shortfall = 0;
 
@@ -79,7 +77,6 @@ export async function startMockExam(formData: FormData) {
     shortfall += q.quota - actualTake;
   }
 
-  // Redistribute shortfall round-robin across domains with remaining capacity
   if (shortfall > 0) {
     let progress = true;
     while (shortfall > 0 && progress) {
@@ -97,7 +94,6 @@ export async function startMockExam(formData: FormData) {
     }
   }
 
-  // Assemble final question set
   let selectedQuestionIds: string[] = [];
   for (const d of domainList) {
     const count = taken.get(d.id) ?? 0;
