@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { startMockExam } from "@/app/(app)/mock-exam/actions";
 
 type Template = {
   id: string;
@@ -23,10 +22,8 @@ const LEVEL_LABELS: Record<string, string> = {
 };
 
 export default function MockExamPicker({ templates }: { templates: Template[] }) {
-  const router = useRouter();
   const [examType, setExamType] = useState(EXAM_TYPES[0]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
-  const [starting, setStarting] = useState(false);
 
   const filteredTemplates = templates.filter((t) => t.exam_type === examType);
   const selectedTemplate = filteredTemplates.find((t) => t.id === selectedTemplateId);
@@ -34,19 +31,6 @@ export default function MockExamPicker({ templates }: { templates: Template[] })
   function handleExamTypeChange(newType: string) {
     setExamType(newType);
     setSelectedTemplateId("");
-  }
-
-  async function handleStart() {
-    if (!selectedTemplateId) return;
-    setStarting(true);
-    const formData = new FormData();
-    formData.set("templateId", selectedTemplateId);
-    const res = await fetch("/mock-exam/start", { method: "POST", body: formData });
-    if (res.redirected) {
-      router.push(res.url);
-    } else {
-      setStarting(false);
-    }
   }
 
   return (
@@ -91,13 +75,16 @@ export default function MockExamPicker({ templates }: { templates: Template[] })
         </div>
       )}
 
-      <button
-        onClick={handleStart}
-        disabled={!selectedTemplateId || starting}
-        className="bg-ink text-paper px-6 py-3 rounded-sm font-medium text-sm disabled:opacity-50 w-full sm:w-auto"
-      >
-        {starting ? "Starting..." : "Start exam"}
-      </button>
+      <form action={startMockExam}>
+        <input type="hidden" name="templateId" value={selectedTemplateId} />
+        <button
+          type="submit"
+          disabled={!selectedTemplateId}
+          className="bg-ink text-paper px-6 py-3 rounded-sm font-medium text-sm disabled:opacity-50 w-full sm:w-auto"
+        >
+          Start exam
+        </button>
+      </form>
     </div>
   );
 }
