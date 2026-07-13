@@ -1,10 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    async function checkAuth() {
+      const { data } = await supabase.auth.getUser();
+      if (data.user) {
+        const { data: profile } = await supabase
+          .from("users")
+          .select("name")
+          .eq("id", data.user.id)
+          .single();
+        setUserName(profile?.name ?? data.user.email ?? "Account");
+      }
+      setCheckingAuth(false);
+    }
+    checkAuth();
+
+    fetch("/api/admin/whoami")
+      .then((res) => res.json())
+      .then((data) => setIsAdmin(!!data.isAdmin))
+      .catch(() => setIsAdmin(false));
+
+    const { data: listener } = supabase.auth.onAuthStateChange(() => {
+      checkAuth();
+    });
+    return () => listener.subscription.unsubscribe();
+  }, []);
 
   const navLinks = [
     { href: "/exams/dha", label: "DHA" },
@@ -33,18 +63,34 @@ export default function Header() {
               {link.label}
             </Link>
           ))}
+          {isAdmin && (
+            <Link href="/admin/dashboard" className="text-amber font-medium hover:text-ink transition">
+              Admin panel
+            </Link>
+          )}
         </nav>
 
         <div className="hidden lg:flex items-center gap-3">
-          <Link href="/login" className="text-sm text-slate hover:text-ink transition">
-            Log in
-          </Link>
-          <Link
-            href="/signup"
-            className="text-sm font-medium bg-ink text-paper px-4 py-2 rounded-sm hover:bg-ink/90 transition"
-          >
-            Start free
-          </Link>
+          {checkingAuth ? null : userName ? (
+            <Link
+              href="/dashboard"
+              className="text-sm font-medium bg-ink text-paper px-4 py-2 rounded-sm hover:bg-ink/90 transition"
+            >
+              {userName}
+            </Link>
+          ) : (
+            <>
+              <Link href="/login" className="text-sm text-slate hover:text-ink transition">
+                Log in
+              </Link>
+              <Link
+                href="/signup"
+                className="text-sm font-medium bg-ink text-paper px-4 py-2 rounded-sm hover:bg-ink/90 transition"
+              >
+                Start free
+              </Link>
+            </>
+          )}
         </div>
 
         <button
@@ -52,21 +98,9 @@ export default function Header() {
           className="lg:hidden flex flex-col justify-center gap-1.5 w-8 h-8"
           aria-label="Toggle menu"
         >
-          <span
-            className={`block h-0.5 w-6 bg-ink transition-transform ${
-              menuOpen ? "rotate-45 translate-y-2" : ""
-            }`}
-          />
-          <span
-            className={`block h-0.5 w-6 bg-ink transition-opacity ${
-              menuOpen ? "opacity-0" : ""
-            }`}
-          />
-          <span
-            className={`block h-0.5 w-6 bg-ink transition-transform ${
-              menuOpen ? "-rotate-45 -translate-y-2" : ""
-            }`}
-          />
+          <span className={`block h-0.5 w-6 bg-ink transition-transform ${menuOpen ? "rotate-45 translate-y-2" : ""}`} />
+          <span className={`block h-0.5 w-6 bg-ink transition-opacity ${menuOpen ? "opacity-0" : ""}`} />
+          <span className={`block h-0.5 w-6 bg-ink transition-transform ${menuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
         </button>
       </div>
 
@@ -82,21 +116,42 @@ export default function Header() {
               {link.label}
             </Link>
           ))}
+          {isAdmin && (
+            <Link
+              href="/admin/dashboard"
+              onClick={() => setMenuOpen(false)}
+              className="py-2.5 text-sm text-amber font-medium border-b border-line"
+            >
+              Admin panel
+            </Link>
+          )}
           <div className="flex flex-col gap-2 pt-4">
-            <Link
-              href="/login"
-              onClick={() => setMenuOpen(false)}
-              className="text-sm text-center border border-line rounded-sm py-2.5 text-ink"
-            >
-              Log in
-            </Link>
-            <Link
-              href="/signup"
-              onClick={() => setMenuOpen(false)}
-              className="text-sm text-center font-medium bg-ink text-paper py-2.5 rounded-sm"
-            >
-              Start free
-            </Link>
+            {userName ? (
+              <Link
+                href="/dashboard"
+                onClick={() => setMenuOpen(false)}
+                className="text-sm text-center font-medium bg-ink text-paper py-2.5 rounded-sm"
+              >
+                {userName}
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  onClick={() => setMenuOpen(false)}
+                  className="text-sm text-center border border-line rounded-sm py-2.5 text-ink"
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/signup"
+                  onClick={() => setMenuOpen(false)}
+                  className="text-sm text-center font-medium bg-ink text-paper py-2.5 rounded-sm"
+                >
+                  Start free
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}
