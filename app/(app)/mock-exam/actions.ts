@@ -47,14 +47,19 @@ export async function startMockExam(formData: FormData) {
   const domainList = domains ?? [];
 
   const poolByDomain = new Map<string, string[]>();
-  for (const d of domainList) {
-    const { data: domainQuestions } = await supabaseAdmin
+const domainResults = await Promise.all(
+  domainList.map((d) =>
+    supabaseAdmin
       .from("questions")
       .select("id")
       .eq("domain_id", d.id)
-      .eq("is_active", true);
-    poolByDomain.set(d.id, shuffle((domainQuestions ?? []).map((q) => q.id)));
-  }
+      .eq("is_active", true)
+  )
+);
+domainList.forEach((d, idx) => {
+  const domainQuestions = domainResults[idx].data;
+  poolByDomain.set(d.id, shuffle((domainQuestions ?? []).map((q) => q.id)));
+});
 
   let allocated = 0;
   const quotas: { domainId: string; quota: number }[] = [];
