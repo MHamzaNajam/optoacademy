@@ -52,9 +52,16 @@ export default async function ProtectedAdminLayout({
   return (
     <div className="min-h-screen bg-mist flex">
       <aside className="w-56 bg-ink text-paper flex flex-col justify-between min-h-screen p-4">
-        <div>
-          <p className="text-sm font-semibold mb-6">OptoAcademy Admin</p>
-          <nav className="flex flex-col gap-1">
+       <div>
+  <p className="text-sm font-semibold mb-2">OptoAcademy Admin</p>
+  <Link
+    href="/"
+    target="_blank"
+    className="text-xs text-white/60 hover:text-white transition mb-6 block"
+  >
+    View live site ↗
+  </Link>
+  <nav className="flex flex-col gap-1">
             {navItems
               .filter((item) => item.show)
               .map((item) => (
