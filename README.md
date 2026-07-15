@@ -13,6 +13,7 @@ DHA / MOH / HAAD mock exam platform. Next.js 14 (App Router) + TypeScript + Tail
 ## What's NOT included yet (by design — these need your credentials)
 
 - Real authentication (Clerk/Auth.js) — UI exists, needs API keys
+- 
 - Real database connection — schema exists, needs a Postgres URL
 - Stripe subscription billing
 - Admin panel for entering questions
