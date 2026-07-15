@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { hasActiveSubscription } from "@/lib/subscription";
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
@@ -6,7 +7,10 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 export default async function PracticeSetupPage() {
   const supabase = createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+if (!user) redirect("/login");
+
+const subscribed = await hasActiveSubscription(user.id);
+if (!subscribed) redirect("/trial");
 
   const { data: domains } = await supabaseAdmin
     .from("domains")
