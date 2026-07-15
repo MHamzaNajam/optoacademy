@@ -15,122 +15,149 @@ function shuffle<T>(array: T[]): T[] {
 
 export async function startMockExam(formData: FormData) {
   const templateId = formData.get("templateId") as string;
+  let attemptId: string | null = null;
 
-  const supabase = createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  try {
+    if (!templateId) {
+      redirect("/mock-exam?error=" + encodeURIComponent("Please choose a format before starting."));
+    }
 
-  const { data: template } = await supabaseAdmin
-    .from("exam_templates")
-    .select("*")
-    .eq("id", templateId)
-    .single();
+    const supabase = createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) redirect("/login");
 
-  if (!template) throw new Error("Exam template not found");
+    const { data: template, error: templateError } = await supabaseAdmin
+      .from("exam_templates")
+      .select("*")
+      .eq("id", templateId)
+      .single();
 
-  const { data: customWeights } = await supabaseAdmin
-    .from("user_domain_weights")
-    .select("domain_id, weight_percentage")
-    .eq("user_id", user.id);
+    if (templateError || !template) {
+      redirect("/mock-exam?error=" + encodeURIComponent("Exam template not found: " + (templateError?.message || "unknown")));
+    }
 
-  const { data: domains } = await supabaseAdmin
-    .from("domains")
-    .select("id, name, weight_percentage");
+    const { data: customWeights } = await supabaseAdmin
+      .from("user_domain_weights")
+      .select("domain_id, weight_percentage")
+      .eq("user_id", user.id);
 
-  const weightMap = new Map(
-    (customWeights && customWeights.length > 0
-      ? customWeights.map((w) => [w.domain_id, w.weight_percentage])
-      : (domains ?? []).map((d) => [d.id, d.weight_percentage]))
-  );
+    const { data: domains, error: domainsError } = await supabaseAdmin
+      .from("domains")
+      .select("id, name, weight_percentage");
 
-  const totalQuestions = template.question_count;
-  const domainList = domains ?? [];
+    if (domainsError) {
+      redirect("/mock-exam?error=" + encodeURIComponent("Could not load domains: " + domainsError.message));
+    }
 
-  const poolByDomain = new Map<string, string[]>();
-const domainResults = await Promise.all(
-  domainList.map((d) =>
-    supabaseAdmin
-      .from("questions")
-      .select("id")
-      .eq("domain_id", d.id)
-      .eq("is_active", true)
-  )
-);
-domainList.forEach((d, idx) => {
-  const domainQuestions = domainResults[idx].data;
-  poolByDomain.set(d.id, shuffle((domainQuestions ?? []).map((q) => q.id)));
-});
+    const weightMap = new Map(
+      (customWeights && customWeights.length > 0
+        ? customWeights.map((w) => [w.domain_id, w.weight_percentage])
+        : (domains ?? []).map((d) => [d.id, d.weight_percentage]))
+    );
 
-  let allocated = 0;
-  const quotas: { domainId: string; quota: number }[] = [];
-  domainList.forEach((d, idx) => {
-    const weight = weightMap.get(d.id) ?? 0;
-    const isLast = idx === domainList.length - 1;
-    const quota = isLast ? totalQuestions - allocated : Math.round((weight / 100) * totalQuestions);
-    allocated += quota;
-    quotas.push({ domainId: d.id, quota: Math.max(0, quota) });
-  });
+    const totalQuestions = template!.question_count;
+    const domainList = domains ?? [];
 
-  const taken = new Map<string, number>();
-  let shortfall = 0;
+    const poolByDomain = new Map<string, string[]>();
+    const domainResults = await Promise.all(
+      domainList.map((d) =>
+        supabaseAdmin
+          .from("questions")
+          .select("id")
+          .eq("domain_id", d.id)
+          .eq("is_active", true)
+      )
+    );
+    domainList.forEach((d, idx) => {
+      const domainQuestions = domainResults[idx].data;
+      poolByDomain.set(d.id, shuffle((domainQuestions ?? []).map((q) => q.id)));
+    });
 
-  for (const q of quotas) {
-    const pool = poolByDomain.get(q.domainId) ?? [];
-    const available = pool.length;
-    const actualTake = Math.min(q.quota, available);
-    taken.set(q.domainId, actualTake);
-    shortfall += q.quota - actualTake;
-  }
+    let allocated = 0;
+    const quotas: { domainId: string; quota: number }[] = [];
+    domainList.forEach((d, idx) => {
+      const weight = weightMap.get(d.id) ?? 0;
+      const isLast = idx === domainList.length - 1;
+      const quota = isLast ? totalQuestions - allocated : Math.round((weight / 100) * totalQuestions);
+      allocated += quota;
+      quotas.push({ domainId: d.id, quota: Math.max(0, quota) });
+    });
 
-  if (shortfall > 0) {
-    let progress = true;
-    while (shortfall > 0 && progress) {
-      progress = false;
-      for (const d of domainList) {
-        if (shortfall <= 0) break;
-        const pool = poolByDomain.get(d.id) ?? [];
-        const currentlyTaken = taken.get(d.id) ?? 0;
-        if (currentlyTaken < pool.length) {
-          taken.set(d.id, currentlyTaken + 1);
-          shortfall -= 1;
-          progress = true;
+    const taken = new Map<string, number>();
+    let shortfall = 0;
+
+    for (const q of quotas) {
+      const pool = poolByDomain.get(q.domainId) ?? [];
+      const available = pool.length;
+      const actualTake = Math.min(q.quota, available);
+      taken.set(q.domainId, actualTake);
+      shortfall += q.quota - actualTake;
+    }
+
+    if (shortfall > 0) {
+      let progress = true;
+      while (shortfall > 0 && progress) {
+        progress = false;
+        for (const d of domainList) {
+          if (shortfall <= 0) break;
+          const pool = poolByDomain.get(d.id) ?? [];
+          const currentlyTaken = taken.get(d.id) ?? 0;
+          if (currentlyTaken < pool.length) {
+            taken.set(d.id, currentlyTaken + 1);
+            shortfall -= 1;
+            progress = true;
+          }
         }
       }
     }
+
+    let selectedQuestionIds: string[] = [];
+    for (const d of domainList) {
+      const count = taken.get(d.id) ?? 0;
+      const pool = poolByDomain.get(d.id) ?? [];
+      selectedQuestionIds = selectedQuestionIds.concat(pool.slice(0, count));
+    }
+    selectedQuestionIds = shuffle(selectedQuestionIds);
+
+    if (selectedQuestionIds.length === 0) {
+      redirect("/mock-exam?error=" + encodeURIComponent("No questions available yet for this exam."));
+    }
+
+    const { data: attempt, error: attemptError } = await supabaseAdmin
+      .from("attempts")
+      .insert({
+        user_id: user.id,
+        exam_template_id: templateId,
+        mode: "TIMED_MOCK",
+      })
+      .select("id")
+      .single();
+
+    if (attemptError || !attempt) {
+      redirect("/mock-exam?error=" + encodeURIComponent("Could not create attempt: " + (attemptError?.message || "unknown")));
+    }
+
+    attemptId = attempt!.id;
+
+    const answerRows = selectedQuestionIds.map((qId) => ({
+      attempt_id: attempt!.id,
+      question_id: qId,
+      selected: null,
+      flagged: false,
+    }));
+
+    const { error: answersError } = await supabaseAdmin.from("answers").insert(answerRows);
+
+    if (answersError) {
+      redirect("/mock-exam?error=" + encodeURIComponent("Could not create answer rows: " + answersError.message));
+    }
+  } catch (err: any) {
+    // redirect() throws internally by design — let that specific case pass through untouched
+    if (err?.digest?.startsWith?.("NEXT_REDIRECT")) {
+      throw err;
+    }
+    redirect("/mock-exam?error=" + encodeURIComponent("Unexpected error: " + (err?.message || String(err))));
   }
 
-  let selectedQuestionIds: string[] = [];
-  for (const d of domainList) {
-    const count = taken.get(d.id) ?? 0;
-    const pool = poolByDomain.get(d.id) ?? [];
-    selectedQuestionIds = selectedQuestionIds.concat(pool.slice(0, count));
-  }
-  selectedQuestionIds = shuffle(selectedQuestionIds);
-
-  if (selectedQuestionIds.length === 0) {
-    throw new Error("No questions available yet for this exam. Please check back soon.");
-  }
-
-  const { data: attempt, error: attemptError } = await supabaseAdmin
-    .from("attempts")
-    .insert({
-      user_id: user.id,
-      exam_template_id: templateId,
-      mode: "TIMED_MOCK",
-    })
-    .select("id")
-    .single();
-
-  if (attemptError || !attempt) throw new Error("Could not start exam attempt");
-
-  const answerRows = selectedQuestionIds.map((qId) => ({
-    attempt_id: attempt.id,
-    question_id: qId,
-    selected: null,
-    flagged: false,
-  }));
-
-  await supabaseAdmin.from("answers").insert(answerRows);
-
-  redirect(`/mock-exam/${attempt.id}`);
+  redirect(`/mock-exam/${attemptId}`);
 }
