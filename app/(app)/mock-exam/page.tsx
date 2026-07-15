@@ -4,7 +4,11 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import Link from "next/link";
 import MockExamPicker from "@/components/exam/MockExamPicker";
 
-export default async function MockExamSetupPage() {
+export default async function MockExamSetupPage({
+  searchParams,
+}: {
+  searchParams: { error?: string };
+}) {
   const supabase = createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -22,6 +26,12 @@ export default async function MockExamSetupPage() {
           ← Back to dashboard
         </Link>
         <h1 className="text-2xl font-semibold text-ink mt-4 mb-8">Choose a mock exam</h1>
+
+        {searchParams.error && (
+          <div className="bg-[#c0392b]/5 border border-[#c0392b]/20 text-[#c0392b] text-sm rounded-sm px-4 py-3 mb-6">
+            <strong>Could not start exam:</strong> {searchParams.error}
+          </div>
+        )}
 
         <MockExamPicker templates={templates ?? []} />
       </div>
