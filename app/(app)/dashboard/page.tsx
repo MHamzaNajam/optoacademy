@@ -18,19 +18,16 @@ export default function DashboardPage() {
         router.push("/login");
         return;
       }
-
       const { data: profile } = await supabase
         .from("users")
         .select("name, is_suspended")
         .eq("id", data.user.id)
         .single();
-
       if (profile?.is_suspended) {
         await supabase.auth.signOut();
         router.push("/suspended");
         return;
       }
-
       setUserName(profile?.name ?? data.user.email ?? "there");
       setLoading(false);
     }
@@ -67,7 +64,7 @@ export default function DashboardPage() {
           </Link>
           <nav className="flex items-center gap-6 text-sm text-slate">
             <span className="text-ink font-medium">Dashboard</span>
-            <Link href="/practice/1">Practice</Link>
+            <Link href="/practice">Practice</Link>
             <Link href="/mock-exam">Mock exam</Link>
             <span className="text-slate/60">{userName}</span>
             <button
@@ -79,10 +76,8 @@ export default function DashboardPage() {
           </nav>
         </div>
       </header>
-
       <main className="max-w-5xl mx-auto px-6 py-10">
         <h1 className="text-2xl font-semibold text-ink mb-8">Welcome back, {userName}</h1>
-
         <div className="grid md:grid-cols-3 gap-4 mb-10">
           {stats.map((s) => (
             <div key={s.label} className="bg-white border border-line rounded-md p-5">
@@ -91,13 +86,13 @@ export default function DashboardPage() {
             </div>
           ))}
         </div>
-
         <div className="flex gap-4">
-          <Link href="/mock-exam/new" className="bg-ink text-paper px-6 py-3 rounded-sm font-medium">
+          <Link href="/mock-exam" className="bg-ink text-paper px-6 py-3 rounded-sm font-medium">
             Start a timed mock exam
-          </Link><Link href="/practice" className="border border-line px-6 py-3 rounded-sm font-medium text-ink">
-  Practice by domain
-</Link>
+          </Link>
+          <Link href="/practice" className="border border-line px-6 py-3 rounded-sm font-medium text-ink">
+            Practice by domain
+          </Link>
         </div>
       </main>
     </div>
