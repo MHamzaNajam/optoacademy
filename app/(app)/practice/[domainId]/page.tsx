@@ -122,13 +122,19 @@ export default function PracticeDomainPage() {
   return (
     <div className="min-h-screen bg-paper px-6 py-10">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <Link href="/practice" className="text-sm text-slate hover:text-ink transition">
+        <div className="flex items-center justify-between mb-6 gap-3">
+          <Link href="/practice" className="text-sm text-slate hover:text-ink transition whitespace-nowrap">
             ← Domains
           </Link>
-          <span className="text-sm text-slate">
+          <span className="text-sm text-slate text-center flex-1">
             {domainName} · Question {current + 1} of {questions.length}
           </span>
+          <Link
+            href="/dashboard"
+            className="text-xs font-medium bg-amber text-white px-4 py-2 rounded-sm hover:bg-amber/90 transition whitespace-nowrap"
+          >
+            Finish practice
+          </Link>
         </div>
 
         <div className="bg-white border border-line rounded-md p-6">
