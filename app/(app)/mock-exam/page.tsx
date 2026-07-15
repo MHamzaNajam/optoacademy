@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { hasActiveSubscription } from "@/lib/subscription";
 import Link from "next/link";
 import MockExamPicker from "@/components/exam/MockExamPicker";
 
@@ -11,7 +12,10 @@ export default async function MockExamSetupPage({
 }) {
   const supabase = createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+if (!user) redirect("/login");
+
+const subscribed = await hasActiveSubscription(user.id);
+if (!subscribed) redirect("/trial");
 
   const { data: templates } = await supabaseAdmin
     .from("exam_templates")
