@@ -6,6 +6,7 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 async function logout() {
   "use server";
+  const supabase = createSupabaseServerClient();
   const cookieStore = cookies();
   cookieStore.delete("admin_auth");
   cookieStore.delete("admin_id");
@@ -47,21 +48,22 @@ export default async function ProtectedAdminLayout({
     { href: "/admin/consultations", label: "Consultations", show: isSuperAdmin || adminRow.can_manage_consultations },
     { href: "/admin/blog", label: "Blog", show: isSuperAdmin || adminRow.can_manage_blog },
     { href: "/admin/admins", label: "Admins", show: isSuperAdmin },
+    { href: "/admin/settings", label: "Settings", show: isSuperAdmin },
   ];
 
   return (
     <div className="min-h-screen bg-mist flex">
       <aside className="w-56 bg-ink text-paper flex flex-col justify-between min-h-screen p-4">
-       <div>
-  <p className="text-sm font-semibold mb-2">OptoAcademy Admin</p>
-  <Link
-    href="/"
-    target="_blank"
-    className="text-xs text-white/60 hover:text-white transition mb-6 block"
-  >
-    View live site ↗
-  </Link>
-  <nav className="flex flex-col gap-1">
+        <div>
+          <p className="text-sm font-semibold mb-2">OptoAcademy Admin</p>
+          <Link
+            href="/"
+            target="_blank"
+            className="text-xs text-white/60 hover:text-white transition mb-6 block"
+          >
+            View live site ↗
+          </Link>
+          <nav className="flex flex-col gap-1">
             {navItems
               .filter((item) => item.show)
               .map((item) => (
