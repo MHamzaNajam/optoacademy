@@ -1,14 +1,29 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Header from "@/components/marketing/Header";
 import Footer from "@/components/marketing/Footer";
 import Link from "next/link";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function HomePage() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [checked, setChecked] = useState(false);
+
+  useEffect(() => {
+    async function checkAuth() {
+      const { data } = await supabase.auth.getUser();
+      setIsLoggedIn(!!data.user);
+      setChecked(true);
+    }
+    checkAuth();
+  }, []);
+
   return (
     <>
       <Header />
 
       <main className="max-w-6xl mx-auto px-6">
-        {/* Hero */}
         <section className="pt-20 pb-16 grid md:grid-cols-2 gap-12 items-center">
           <div>
             <p className="text-amber font-mono text-sm mb-4 tracking-wide">
@@ -26,12 +41,21 @@ export default function HomePage() {
               way the real exam works.
             </p>
             <div className="flex gap-4">
-              <Link
-                href="/signup"
-                className="bg-ink text-paper px-6 py-3 rounded-sm font-medium hover:bg-ink/90 transition"
-              >
-                Start free practice
-              </Link>
+              {checked && isLoggedIn ? (
+                <Link
+                  href="/dashboard"
+                  className="bg-ink text-paper px-6 py-3 rounded-sm font-medium hover:bg-ink/90 transition"
+                >
+                  Go to dashboard
+                </Link>
+              ) : (
+                <Link
+                  href="/signup"
+                  className="bg-ink text-paper px-6 py-3 rounded-sm font-medium hover:bg-ink/90 transition"
+                >
+                  Start free practice
+                </Link>
+              )}
               <Link
                 href="/exams/dha"
                 className="border border-line px-6 py-3 rounded-sm font-medium text-ink hover:border-slate transition"
@@ -41,7 +65,6 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Snellen-chart signature element */}
           <div className="bg-ink rounded-md p-10 flex flex-col items-center justify-center gap-3 select-none">
             <p style={{ fontSize: "34px" }} className="text-paper/95 font-mono tracking-widest text-center w-full">
               DHA MOH HAAD
@@ -61,7 +84,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Value props */}
         <section className="py-16 border-t border-line grid md:grid-cols-3 gap-10">
           <div>
             <p className="font-mono text-amber text-sm mb-2">01</p>
