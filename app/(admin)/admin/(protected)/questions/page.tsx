@@ -231,13 +231,13 @@ export default async function QuestionsPage({
         </button>
 
         {(search || domainFilter || difficultyFilter || statusFilter || sort !== "newest") && (
-          <Link
-            href="/admin/questions"
-            className="text-xs text-slate underline"
-          >
-            Clear filters
-          </Link>
-        )}
+  <Link
+    href="/admin/questions"
+    className="text-xs font-medium text-amber bg-amber/10 px-3 py-2 rounded-sm hover:bg-amber/20 transition"
+  >
+    Clear filters
+  </Link>
+)}
       </form>
 
       <QuestionsTable questions={questions} page={page} currentQuery={filterQueryString} />
