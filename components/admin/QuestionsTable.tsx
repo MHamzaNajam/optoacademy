@@ -120,9 +120,11 @@ export default function QuestionsTable({
                 </td>
                 <td className="px-4 py-3">
                   <Link
-                    href={`/admin/questions/${q.id}/edit`}
-                    className="text-xs border border-line px-2 py-1 rounded-sm hover:bg-mist transition text-ink"
-                  >
+  href={`/admin/questions/${q.id}/edit?returnQuery=${encodeURIComponent(currentQuery)}`}
+  className="text-xs border border-line px-2 py-1 rounded-sm hover:bg-mist transition text-ink"
+>
+  Edit
+</Link>
                     Edit
                   </Link>
                 </td>
