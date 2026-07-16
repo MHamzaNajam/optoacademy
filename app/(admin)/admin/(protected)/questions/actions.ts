@@ -33,7 +33,6 @@ export async function deleteQuestion(formData: FormData) {
 
 export async function updateQuestion(formData: FormData) {
   await checkPermission();
-
   const id = formData.get("id") as string;
   const domain_id = formData.get("domain_id") as string;
   const stem = formData.get("stem") as string;
@@ -47,6 +46,9 @@ export async function updateQuestion(formData: FormData) {
   const difficulty = formData.get("difficulty") as string;
   const is_active = formData.get("is_active") === "on";
   const is_trial = formData.get("is_trial") === "on";
+  const trialOrderRaw = formData.get("trial_order") as string;
+  const trial_order = trialOrderRaw ? parseInt(trialOrderRaw, 10) : null;
+  const returnQuery = (formData.get("returnQuery") as string) || "";
 
   await supabaseAdmin
     .from("questions")
@@ -63,9 +65,10 @@ export async function updateQuestion(formData: FormData) {
       difficulty,
       is_active,
       is_trial,
+      trial_order,
       updated_at: new Date().toISOString(),
     })
     .eq("id", id);
 
-  redirect("/admin/questions?success=updated");
+  redirect(`/admin/questions?success=updated${returnQuery ? `&${returnQuery}` : ""}`);
 }
