@@ -240,7 +240,7 @@ export default async function QuestionsPage({
         )}
       </form>
 
-      <QuestionsTable questions={questions} page={page} />
+      <QuestionsTable questions={questions} page={page} currentQuery={filterQueryString} />
 
       <div className="flex items-center gap-3 mt-6">
         {page > 1 && (
