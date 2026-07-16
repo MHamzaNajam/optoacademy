@@ -10,6 +10,9 @@ export default function DashboardPage() {
   const router = useRouter();
   const [userName, setUserName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [examsTaken, setExamsTaken] = useState(0);
+  const [averageScore, setAverageScore] = useState<string>("—");
+  const [weakestDomain, setWeakestDomain] = useState<string>("—");
 
   useEffect(() => {
     async function checkUser() {
@@ -18,17 +21,66 @@ export default function DashboardPage() {
         router.push("/login");
         return;
       }
+
       const { data: profile } = await supabase
         .from("users")
         .select("name, is_suspended")
         .eq("id", data.user.id)
         .single();
+
       if (profile?.is_suspended) {
         await supabase.auth.signOut();
         router.push("/suspended");
         return;
       }
+
       setUserName(profile?.name ?? data.user.email ?? "there");
+
+      const { data: attempts } = await supabase
+        .from("attempts")
+        .select("id, score")
+        .eq("user_id", data.user.id)
+        .not("submitted_at", "is", null);
+
+      if (attempts && attempts.length > 0) {
+        setExamsTaken(attempts.length);
+
+        const avg =
+          attempts.reduce((sum, a) => sum + (a.score ?? 0), 0) / attempts.length;
+        setAverageScore(`${Math.round(avg)}%`);
+
+        const attemptIds = attempts.map((a) => a.id);
+        const { data: answers } = await supabase
+          .from("answers")
+          .select("selected, questions(correct_option, domain_id, domains(name))")
+          .in("attempt_id", attemptIds);
+
+        const domainStats: Record<string, { name: string; correct: number; total: number }> = {};
+
+        (answers ?? []).forEach((a: any) => {
+          const domainId = a.questions?.domain_id;
+          const domainName = a.questions?.domains?.name ?? "Unknown";
+          if (!domainId) return;
+          if (!domainStats[domainId]) {
+            domainStats[domainId] = { name: domainName, correct: 0, total: 0 };
+          }
+          domainStats[domainId].total += 1;
+          if (a.selected && a.selected === a.questions?.correct_option) {
+            domainStats[domainId].correct += 1;
+          }
+        });
+
+        const domainList = Object.values(domainStats).map((d) => ({
+          ...d,
+          percentage: d.total > 0 ? (d.correct / d.total) * 100 : 0,
+        }));
+
+        if (domainList.length > 0) {
+          const weakest = domainList.sort((a, b) => a.percentage - b.percentage)[0];
+          setWeakestDomain(`${weakest.name} (${Math.round(weakest.percentage)}%)`);
+        }
+      }
+
       setLoading(false);
     }
     checkUser();
@@ -48,9 +100,9 @@ export default function DashboardPage() {
   }
 
   const stats = [
-    { label: "Mock exams taken", value: "0" },
-    { label: "Average score", value: "—" },
-    { label: "Weakest domain", value: "—" },
+    { label: "Mock exams taken", value: String(examsTaken) },
+    { label: "Average score", value: averageScore },
+    { label: "Weakest domain", value: weakestDomain },
   ];
 
   return (
@@ -76,8 +128,10 @@ export default function DashboardPage() {
           </nav>
         </div>
       </header>
+
       <main className="max-w-5xl mx-auto px-6 py-10">
         <h1 className="text-2xl font-semibold text-ink mb-8">Welcome back, {userName}</h1>
+
         <div className="grid md:grid-cols-3 gap-4 mb-10">
           {stats.map((s) => (
             <div key={s.label} className="bg-white border border-line rounded-md p-5">
@@ -86,6 +140,7 @@ export default function DashboardPage() {
             </div>
           ))}
         </div>
+
         <div className="flex gap-4">
           <Link href="/mock-exam" className="bg-ink text-paper px-6 py-3 rounded-sm font-medium">
             Start a timed mock exam
