@@ -28,7 +28,6 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // This refreshes the session if expired, and keeps cookies in sync
   await supabase.auth.getUser();
 
   return response;
@@ -36,6 +35,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|admin|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
