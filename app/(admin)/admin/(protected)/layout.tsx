@@ -28,11 +28,35 @@ export default async function ProtectedAdminLayout({
     redirect("/admin");
   }
 
-  const { data: adminRow } = await supabaseAdmin
-    .from("admin_users")
-    .select("email, role, can_manage_questions, can_manage_users, can_manage_consultations, can_manage_blog, can_view_analytics")
-    .eq("id", adminId)
-    .single();
+  let adminRow: any = null;
+  let queryErrorMessage: string | null = null;
+
+  try {
+    const result = await supabaseAdmin
+      .from("admin_users")
+      .select("email, role, can_manage_questions, can_manage_users, can_manage_consultations, can_manage_blog, can_view_analytics")
+      .eq("id", adminId)
+      .single();
+
+    adminRow = result.data;
+    if (result.error) {
+      queryErrorMessage = result.error.message;
+    }
+  } catch (err: any) {
+    queryErrorMessage = err?.message || String(err);
+  }
+
+  if (queryErrorMessage) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-mist px-6">
+        <div className="max-w-lg bg-white border border-[#c0392b]/30 rounded-md p-6">
+          <h1 className="text-lg font-semibold text-[#c0392b] mb-2">Admin panel error</h1>
+          <p className="text-sm text-slate mb-2">The admin_users lookup failed:</p>
+          <pre className="text-xs bg-mist p-3 rounded-sm overflow-auto text-ink">{queryErrorMessage}</pre>
+        </div>
+      </div>
+    );
+  }
 
   if (!adminRow) {
     redirect("/admin");
