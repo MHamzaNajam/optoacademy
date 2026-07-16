@@ -17,9 +17,11 @@ type Question = {
 export default function QuestionsTable({
   questions,
   page,
+  currentQuery,
 }: {
   questions: Question[];
   page: number;
+  currentQuery: string;
 }) {
   const [selected, setSelected] = useState<string[]>([]);
   const [deleting, setDeleting] = useState(false);
