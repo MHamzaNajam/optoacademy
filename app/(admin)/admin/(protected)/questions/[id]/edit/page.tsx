@@ -198,7 +198,7 @@ export default async function EditQuestionPage({
           >
             Save changes
           </button>
-          
+          <a
             href={cancelHref}
             className="border border-line px-6 py-2.5 rounded-sm font-medium text-sm text-ink flex items-center"
           >
