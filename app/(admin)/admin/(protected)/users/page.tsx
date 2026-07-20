@@ -32,7 +32,7 @@ export default async function UsersPage() {
       <h1 className="text-2xl font-semibold text-ink mb-8">
         Users {users && users.length > 0 && `(${users.length})`}
       </h1>
-      <UsersTableClient users={users || []} />
+      <UsersTableClient users={users} returnQuery={filterQueryString} />
     </div>
   );
 }
