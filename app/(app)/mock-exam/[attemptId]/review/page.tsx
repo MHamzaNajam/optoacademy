@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import NoCopyGuard from "@/components/NoCopyGuard";
 
 export default async function ReviewPage({
   params,
@@ -39,7 +40,6 @@ export default async function ReviewPage({
     );
   }
 
-  // Mark as viewed now, before showing content — this is what makes it one-time
   await supabaseAdmin
     .from("attempts")
     .update({ review_viewed_at: new Date().toISOString() })
@@ -52,6 +52,7 @@ export default async function ReviewPage({
 
   return (
     <div className="min-h-screen bg-paper px-6 py-10">
+      <NoCopyGuard />
       <div className="max-w-3xl mx-auto">
         <div className="bg-amber/10 border border-amber/30 text-amber text-sm rounded-sm px-4 py-3 mb-6">
           This is your one-time review for this attempt. Once you leave this page, it can't be viewed again.
