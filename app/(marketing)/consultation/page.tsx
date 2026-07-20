@@ -60,6 +60,25 @@ export default function ConsultationPage() {
           </p>
         </section>
 
+        {/* Pricing */}
+<section className="max-w-3xl mx-auto px-6 pb-16">
+  <div className="bg-white border border-line rounded-md p-8 text-center">
+    <p className="text-sm text-slate mb-2">One-on-one coaching</p>
+    <p className="text-4xl font-bold text-ink mb-1">$550</p>
+    <p className="text-sm text-slate mb-6">PKR 150,000 (Pakistan)</p>
+
+    <div className="border-2 border-amber rounded-md p-5 bg-amber/5">
+      <span className="text-xs font-semibold bg-amber text-white px-3 py-1 rounded-sm">
+        LIMITED TIME — PAKISTAN OFFER
+      </span>
+      <p className="text-2xl font-bold text-ink mt-3">PKR 100,000</p>
+      <p className="text-xs text-slate mt-1">
+        Special introductory pricing for Pakistan-based candidates. Standard pricing applies afterward.
+      </p>
+    </div>
+  </div>
+</section>
+        
         {/* What's included */}
         <section className="bg-haze py-16">
           <div className="max-w-5xl mx-auto px-6 grid md:grid-cols-3 gap-8">
