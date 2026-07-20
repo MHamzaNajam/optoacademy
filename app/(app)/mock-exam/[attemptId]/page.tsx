@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import ExamTimer from "@/components/exam/ExamTimer";
 import QuestionNavigator from "@/components/exam/QuestionNavigator";
 import QuestionPanel from "@/components/exam/QuestionPanel";
+import NoCopyGuard from "@/components/NoCopyGuard";
 import { supabase } from "@/lib/supabaseClient";
 
 type AttemptQuestion = {
@@ -144,6 +145,7 @@ export default function MockExamPage() {
 
   return (
     <div className="min-h-screen bg-[#e9edf0] flex items-center justify-center py-8">
+      <NoCopyGuard />
       <div className="w-full max-w-[1100px] border border-[#b7c0c8] bg-white shadow-lg">
         <div className="bg-ink text-paper flex items-center justify-between px-4 py-2.5 text-[13px]">
           <div className="flex items-center gap-2 font-semibold tracking-wide">
@@ -205,21 +207,21 @@ export default function MockExamPage() {
               &lt; Back
             </button>
             {current < questions.length ? (
-  <button
-    onClick={() => setCurrent((c) => Math.min(questions.length, c + 1))}
-    className="text-[13px] font-semibold bg-ink text-paper px-4 py-2 rounded-sm"
-  >
-    Next &gt;
-  </button>
-) : (
-  <button
-    onClick={confirmSubmit}
-    disabled={submitting}
-    className="text-[13px] font-semibold bg-[#c0392b] text-white px-4 py-2 rounded-sm disabled:opacity-60"
-  >
-    {submitting ? "Submitting..." : "Finish & Submit"}
-  </button>
-)}
+              <button
+                onClick={() => setCurrent((c) => Math.min(questions.length, c + 1))}
+                className="text-[13px] font-semibold bg-ink text-paper px-4 py-2 rounded-sm"
+              >
+                Next &gt;
+              </button>
+            ) : (
+              <button
+                onClick={confirmSubmit}
+                disabled={submitting}
+                className="text-[13px] font-semibold bg-[#c0392b] text-white px-4 py-2 rounded-sm disabled:opacity-60"
+              >
+                {submitting ? "Submitting..." : "Finish & Submit"}
+              </button>
+            )}
           </div>
         </div>
       </div>
