@@ -204,12 +204,22 @@ export default function MockExamPage() {
             >
               &lt; Back
             </button>
-            <button
-              onClick={() => setCurrent((c) => Math.min(questions.length, c + 1))}
-              className="text-[13px] font-semibold bg-ink text-paper px-4 py-2 rounded-sm"
-            >
-              Next &gt;
-            </button>
+            {current < questions.length ? (
+  <button
+    onClick={() => setCurrent((c) => Math.min(questions.length, c + 1))}
+    className="text-[13px] font-semibold bg-ink text-paper px-4 py-2 rounded-sm"
+  >
+    Next &gt;
+  </button>
+) : (
+  <button
+    onClick={confirmSubmit}
+    disabled={submitting}
+    className="text-[13px] font-semibold bg-[#c0392b] text-white px-4 py-2 rounded-sm disabled:opacity-60"
+  >
+    {submitting ? "Submitting..." : "Finish & Submit"}
+  </button>
+)}
           </div>
         </div>
       </div>
