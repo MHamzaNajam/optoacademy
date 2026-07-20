@@ -14,7 +14,7 @@ const plans = [
     priceUsd: "$190",
     pricePkr: "PKR 50,000",
     period: "/ 3 months",
-    features: ["Everything in 1 month", "Best for a full prep cycle", "Priority content updates"],
+    features: ["Everything for 3 months", "Best for a full prep cycle", "Priority content updates"],
     featured: true,
   },
   {
@@ -22,7 +22,7 @@ const plans = [
     priceUsd: "$300",
     pricePkr: "PKR 80,000",
     period: "/ 6 months",
-    features: ["Everything in 3 months", "Extended access for longer prep timelines", "Best value per month"],
+    features: ["Everything for 6 months", "Extended access for longer prep timelines", "Best value per month"],
   },
 ];
 
