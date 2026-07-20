@@ -5,10 +5,10 @@ import Link from "next/link";
 import { toggleSuspend, updateSubscription } from "@/app/(admin)/admin/(protected)/users/actions";
 import { DeleteUserButton, BulkDeleteBar } from "./UsersDeleteControls";
 
-const PLAN_OPTIONS = ["FREE", "MONTH_1", "MONTH_3", "LIFETIME"];
+const PLAN_OPTIONS = ["FREE", "MONTH_1", "MONTH_3", "MONTH_6"];
 const STATUS_OPTIONS = ["active", "canceled", "expired"];
 
-export default function UsersTableClient({ users }: { users: any[] }) {
+export default function UsersTableClient({ users, returnQuery }: { users: any[]; returnQuery: string }) {
   const [selected, setSelected] = useState<string[]>([]);
   const allSelected = users.length > 0 && selected.length === users.length;
 
@@ -38,6 +38,7 @@ export default function UsersTableClient({ users }: { users: any[] }) {
               <th className="px-4 py-3">Institute</th>
               <th className="px-4 py-3">Joined</th>
               <th className="px-4 py-3">Subscription</th>
+              <th className="px-4 py-3">Time left</th>
               <th className="px-4 py-3">Account status</th>
               <th className="px-4 py-3">Mock exam settings</th>
               <th className="px-4 py-3">Delete</th>
@@ -75,6 +76,7 @@ export default function UsersTableClient({ users }: { users: any[] }) {
                   <td className="px-4 py-3">
                     <form action={updateSubscription} className="flex flex-col gap-1.5">
                       <input type="hidden" name="userId" value={u.id} />
+                      <input type="hidden" name="returnQuery" value={returnQuery} />
                       <select
                         name="plan"
                         defaultValue={sub?.plan ?? "FREE"}
@@ -101,10 +103,14 @@ export default function UsersTableClient({ users }: { users: any[] }) {
                       </button>
                     </form>
                   </td>
+                  <td className="px-4 py-3 text-slate whitespace-nowrap">
+                    {u.daysLeft !== null ? `${u.daysLeft} day(s)` : "—"}
+                  </td>
                   <td className="px-4 py-3">
                     <form action={toggleSuspend}>
                       <input type="hidden" name="userId" value={u.id} />
                       <input type="hidden" name="currentlySuspended" value={String(u.is_suspended)} />
+                      <input type="hidden" name="returnQuery" value={returnQuery} />
                       <button
                         type="submit"
                         className={`text-xs px-2 py-1 rounded-sm border transition ${
@@ -133,8 +139,8 @@ export default function UsersTableClient({ users }: { users: any[] }) {
             })}
             {users.length === 0 && (
               <tr>
-                <td colSpan={9} className="px-4 py-8 text-center text-slate text-sm">
-                  No users yet.
+                <td colSpan={10} className="px-4 py-8 text-center text-slate text-sm">
+                  No users match.
                 </td>
               </tr>
             )}
