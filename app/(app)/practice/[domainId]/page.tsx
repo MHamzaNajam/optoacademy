@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
+import NoCopyGuard from "@/components/NoCopyGuard";
 
 type PracticeQuestion = {
   id: string;
@@ -121,6 +122,7 @@ export default function PracticeDomainPage() {
 
   return (
     <div className="min-h-screen bg-paper px-6 py-10">
+      <NoCopyGuard />
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-6 gap-3">
           <Link href="/practice" className="text-sm text-slate hover:text-ink transition whitespace-nowrap">
