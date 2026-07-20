@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { PLAN_DURATIONS } from "@/lib/subscription";
 
 async function checkPermission() {
   const cookieStore = cookies();
@@ -22,16 +23,16 @@ async function checkPermission() {
 
 export async function toggleSuspend(formData: FormData) {
   await checkPermission();
-
   const userId = formData.get("userId") as string;
   const currentlySuspended = formData.get("currentlySuspended") === "true";
+  const returnQuery = (formData.get("returnQuery") as string) || "";
 
   await supabaseAdmin
     .from("users")
     .update({ is_suspended: !currentlySuspended })
     .eq("id", userId);
 
-  redirect("/admin/users");
+  redirect(`/admin/users${returnQuery ? `?${returnQuery}` : ""}`);
 }
 
 export async function updateSubscription(formData: FormData) {
@@ -40,6 +41,14 @@ export async function updateSubscription(formData: FormData) {
   const userId = formData.get("userId") as string;
   const plan = formData.get("plan") as string;
   const status = formData.get("status") as string;
+  const returnQuery = (formData.get("returnQuery") as string) || "";
+
+  let current_period_end: string | null = null;
+  if (plan !== "FREE" && PLAN_DURATIONS[plan]) {
+    const end = new Date();
+    end.setDate(end.getDate() + PLAN_DURATIONS[plan]);
+    current_period_end = end.toISOString();
+  }
 
   const { data: existing } = await supabaseAdmin
     .from("subscriptions")
@@ -50,23 +59,20 @@ export async function updateSubscription(formData: FormData) {
   if (existing) {
     await supabaseAdmin
       .from("subscriptions")
-      .update({ plan, status })
+      .update({ plan, status, current_period_end })
       .eq("user_id", userId);
   } else {
     await supabaseAdmin
       .from("subscriptions")
-      .insert({ user_id: userId, plan, status });
+      .insert({ user_id: userId, plan, status, current_period_end });
   }
 
-  redirect("/admin/users");
+  redirect(`/admin/users${returnQuery ? `?${returnQuery}` : ""}`);
 }
+
 export async function deleteUser(formData: FormData) {
   await checkPermission();
-
   const userId = formData.get("userId") as string;
-
-  // Deleting the Supabase Auth user cascades to remove their row in the users table too
   await supabaseAdmin.auth.admin.deleteUser(userId);
-
   redirect("/admin/users");
 }
