@@ -97,20 +97,26 @@ export default async function ResultsPage({
           </div>
         </div>
 
-        <div className="flex gap-4 mt-8">
-          <Link
-            href="/mock-exam"
-            className="bg-ink text-paper px-6 py-3 rounded-sm font-medium text-sm"
-          >
-            Take another mock exam
-          </Link>
-          <Link
-            href="/dashboard"
-            className="border border-line px-6 py-3 rounded-sm font-medium text-ink text-sm"
-          >
-            Back to dashboard
-          </Link>
-        </div>
+        <div className="flex gap-4 mt-8 flex-wrap">
+  <Link
+    href={`/mock-exam/${params.attemptId}/review`}
+    className="bg-amber text-white px-6 py-3 rounded-sm font-medium text-sm"
+  >
+    Review your answers (one-time)
+  </Link>
+  <Link
+    href="/mock-exam"
+    className="bg-ink text-paper px-6 py-3 rounded-sm font-medium text-sm"
+  >
+    Take another mock exam
+  </Link>
+  <Link
+    href="/dashboard"
+    className="border border-line px-6 py-3 rounded-sm font-medium text-ink text-sm"
+  >
+    Back to dashboard
+  </Link>
+</div>
       </div>
     </div>
   );
