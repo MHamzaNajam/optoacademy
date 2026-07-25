@@ -23,7 +23,7 @@ async function checkAccess() {
 export default async function UsersPage({
   searchParams,
 }: {
-  searchParams: { search?: string; plan?: string; status?: string };
+  searchParams: { search?: string; plan?: string; status?: string; error?: string };
 }) {
   await checkAccess();
 
@@ -67,6 +67,12 @@ export default async function UsersPage({
       <h1 className="text-2xl font-semibold text-ink mb-6">
         Users {users.length > 0 && `(${users.length})`}
       </h1>
+
+      {searchParams.error && (
+        <div className="bg-[#c0392b]/5 border border-[#c0392b]/20 text-[#c0392b] text-sm rounded-sm px-4 py-3 mb-6">
+          <strong>Delete failed:</strong> {searchParams.error}
+        </div>
+      )}
 
       <form method="GET" className="bg-white border border-line rounded-md p-4 mb-6 flex flex-wrap gap-3 items-end">
         <div>
