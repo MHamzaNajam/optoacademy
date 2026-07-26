@@ -31,27 +31,26 @@ export async function POST(req: NextRequest) {
     current_period_end = end.toISOString();
   }
 
-  const { data: existing } = await supabaseAdmin
+  const { data: saved, error } = await supabaseAdmin
     .from("subscriptions")
-    .select("id")
-    .eq("user_id", userId)
+    .upsert(
+      { user_id: userId, plan, status, current_period_end },
+      { onConflict: "user_id" }
+    )
+    .select("plan, status, current_period_end")
     .single();
 
-  if (existing) {
-    await supabaseAdmin
-      .from("subscriptions")
-      .update({ plan, status, current_period_end })
-      .eq("user_id", userId);
-  } else {
-    await supabaseAdmin
-      .from("subscriptions")
-      .insert({ user_id: userId, plan, status, current_period_end });
+  if (error || !saved) {
+    return NextResponse.json(
+      { error: `Database save failed: ${error?.message || "unknown error"}` },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({
-    plan,
-    status,
-    current_period_end,
-    daysLeft: daysRemaining(current_period_end),
+    plan: saved.plan,
+    status: saved.status,
+    current_period_end: saved.current_period_end,
+    daysLeft: daysRemaining(saved.current_period_end),
   });
 }
