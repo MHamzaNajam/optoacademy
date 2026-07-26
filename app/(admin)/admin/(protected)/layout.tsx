@@ -1,6 +1,5 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
@@ -80,24 +79,24 @@ export default async function ProtectedAdminLayout({
       <aside className="w-56 bg-ink text-paper flex flex-col justify-between min-h-screen p-4">
         <div>
           <p className="text-sm font-semibold mb-2">OptoAcademy Admin</p>
-          <Link
+          
             href="/"
             target="_blank"
             className="text-xs text-white/60 hover:text-white transition mb-6 block"
           >
             View live site ↗
-          </Link>
+          </a>
           <nav className="flex flex-col gap-1">
             {navItems
               .filter((item) => item.show)
               .map((item) => (
-                <Link
+                
                   key={item.href}
                   href={item.href}
                   className="text-sm px-3 py-2 rounded-sm hover:bg-white/10 transition"
                 >
                   {item.label}
-                </Link>
+                </a>
               ))}
           </nav>
         </div>
