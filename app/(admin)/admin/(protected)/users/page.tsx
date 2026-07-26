@@ -4,6 +4,9 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { daysRemaining } from "@/lib/subscription";
 import UsersTableClient from "@/components/admin/UsersTableClient";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 async function checkAccess() {
   const cookieStore = cookies();
   const adminId = cookieStore.get("admin_id")?.value;
