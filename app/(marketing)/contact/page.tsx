@@ -70,7 +70,7 @@ function ContactContent() {
           <li>A screenshot of your payment confirmation</li>
         </ul>
         
-          href={WHATSAPP_LINK}
+          <a href={WHATSAPP_LINK}
           target="_blank"
           rel="noopener noreferrer"
           className="bg-teal text-white px-6 py-3 rounded-sm font-medium text-sm inline-block"
