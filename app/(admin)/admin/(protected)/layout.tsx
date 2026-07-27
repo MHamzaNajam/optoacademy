@@ -80,7 +80,7 @@ export default async function ProtectedAdminLayout({
         <div>
           <p className="text-sm font-semibold mb-2">OptoAcademy Admin</p>
           
-            href="/"
+            <a href="/"
             target="_blank"
             className="text-xs text-white/60 hover:text-white transition mb-6 block"
           >
@@ -91,7 +91,7 @@ export default async function ProtectedAdminLayout({
               .filter((item) => item.show)
               .map((item) => (
                 
-                  key={item.href}
+                  <a key={item.href}
                   href={item.href}
                   className="text-sm px-3 py-2 rounded-sm hover:bg-white/10 transition"
                 >
