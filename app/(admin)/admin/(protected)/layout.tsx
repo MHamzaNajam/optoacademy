@@ -69,6 +69,7 @@ export default async function ProtectedAdminLayout({
     { href: "/admin/domains", label: "Domain Weighting", show: isSuperAdmin || adminRow.can_manage_questions },
     { href: "/admin/users", label: "Users", show: isSuperAdmin || adminRow.can_manage_users },
     { href: "/admin/consultations", label: "Consultations", show: isSuperAdmin || adminRow.can_manage_consultations },
+    { href: "/admin/support", label: "Contact Us Messages", show: isSuperAdmin || adminRow.can_manage_consultations },
     { href: "/admin/blog", label: "Blog", show: isSuperAdmin || adminRow.can_manage_blog },
     { href: "/admin/admins", label: "Admins", show: isSuperAdmin },
     { href: "/admin/settings", label: "Settings", show: isSuperAdmin },
