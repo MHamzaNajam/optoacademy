@@ -13,6 +13,7 @@ const PLAN_DETAILS: Record<string, { name: string; usd: string; pkr: string }> =
 
 const WHATSAPP_NUMBER = "+92 317 4297669";
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^0-9]/g, "")}`;
+const CONTACT_EMAIL = "optoacadmy1@gmail.com";
 
 const ACCOUNT_TITLE = "PLACEHOLDER — Account Title";
 const ACCOUNT_NUMBER = "PLACEHOLDER — Account Number (usable for Easypaisa, JazzCash, and bank transfer)";
@@ -28,17 +29,14 @@ function ContactContent() {
     <main className="max-w-3xl mx-auto px-6 py-16">
       <h1 className="text-3xl font-semibold text-ink mb-3">Activate your subscription</h1>
       <p className="text-slate mb-10 max-w-xl">
-        We don't have automated card payments yet — activation is done manually
-        within 24 hours after your payment is verified.
+        Your account will be activated manually within 24 hours after your payment is verified.
       </p>
 
       {plan && (
         <div className="bg-amber/10 border border-amber/30 rounded-md p-5 mb-10">
           <p className="text-xs text-slate mb-1">Selected package</p>
           <p className="text-xl font-semibold text-ink">{plan.name}</p>
-          <p className="text-sm text-slate">
-            <span className="font-bold text-ink">{plan.usd}</span> · {plan.pkr} (Pakistan)
-          </p>
+          <p className="text-sm text-slate"><span className="font-bold text-ink">{plan.usd}</span> · {plan.pkr} (Pakistan)</p>
         </div>
       )}
 
@@ -59,9 +57,9 @@ function ContactContent() {
       </section>
 
       <section className="mb-10">
-        <h2 className="text-lg font-semibold text-ink mb-4">Step 2 — Send us the details on WhatsApp</h2>
+        <h2 className="text-lg font-semibold text-ink mb-4">Step 2 — Send us the details</h2>
         <p className="text-sm text-slate mb-4">
-          Message us on WhatsApp with the following:
+          Reach out via WhatsApp at <span className="font-bold text-ink">{WHATSAPP_NUMBER}</span> or by email with the following:
         </p>
         <ul className="text-sm text-slate space-y-2 mb-6 list-disc list-inside">
           <li>Your full name</li>
@@ -69,14 +67,10 @@ function ContactContent() {
           <li>The package you selected</li>
           <li>A screenshot of your payment confirmation</li>
         </ul>
-        
-          <a href={WHATSAPP_LINK}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="bg-teal text-white px-6 py-3 rounded-sm font-medium text-sm inline-block"
-        >
-          Message us on WhatsApp: {WHATSAPP_NUMBER}
-        </a>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="bg-teal text-white px-6 py-3 rounded-sm font-medium text-sm inline-block text-center">Message us on WhatsApp: {WHATSAPP_NUMBER}</a>
+          <a href={`mailto:${CONTACT_EMAIL}`} className="border border-line px-6 py-3 rounded-sm font-medium text-sm inline-block text-center text-ink">Email us: {CONTACT_EMAIL}</a>
+        </div>
       </section>
 
       <section className="mb-10">
@@ -99,7 +93,7 @@ function ContactContent() {
       </section>
 
       <p className="text-xs text-slate mt-10 text-center">
-        Questions before paying? Message us on WhatsApp — we're happy to help.
+        Questions before paying? Message us on WhatsApp or email — we're happy to help.
       </p>
     </main>
   );
