@@ -45,6 +45,7 @@ export default function Header() {
     { href: "/exams/nhra", label: "NHRA" },
     { href: "/pricing", label: "Pricing" },
     { href: "/consultation", label: "1-on-1 Coaching" },
+    { href: "/support", label: "Contact Us" },
   ];
 
   return (
