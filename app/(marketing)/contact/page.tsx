@@ -11,19 +11,12 @@ const PLAN_DETAILS: Record<string, { name: string; usd: string; pkr: string }> =
   month6: { name: "6 Month Plan", usd: "$300", pkr: "PKR 80,000" },
 };
 
-// TODO: replace all placeholders below with real details
-const WHATSAPP_NUMBER = "+92XXXXXXXXXX"; // PLACEHOLDER
+const WHATSAPP_NUMBER = "+92 317 4297669";
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^0-9]/g, "")}`;
 
-const EASYPAISA_TITLE = "PLACEHOLDER — Account Title";
-const EASYPAISA_NUMBER = "PLACEHOLDER — 03XXXXXXXXX";
-
-const JAZZCASH_TITLE = "PLACEHOLDER — Account Title";
-const JAZZCASH_NUMBER = "PLACEHOLDER — 03XXXXXXXXX";
-
+const ACCOUNT_TITLE = "PLACEHOLDER — Account Title";
+const ACCOUNT_NUMBER = "PLACEHOLDER — Account Number (usable for Easypaisa, JazzCash, and bank transfer)";
 const BANK_NAME = "PLACEHOLDER — Bank Name";
-const BANK_TITLE = "PLACEHOLDER — Account Title";
-const BANK_ACCOUNT_NUMBER = "PLACEHOLDER — Account Number";
 const BANK_IBAN = "PLACEHOLDER — IBAN";
 
 function ContactContent() {
@@ -49,37 +42,22 @@ function ContactContent() {
         </div>
       )}
 
-      {/* Step 1 */}
       <section className="mb-10">
         <h2 className="text-lg font-semibold text-ink mb-4">Step 1 — Send payment</h2>
         <p className="text-sm text-slate mb-4">
-          Transfer the amount for your selected package using any of the methods below.
+          Transfer the amount for your selected package to the account below,
+          using whichever method is easiest for you — Easypaisa, JazzCash, or
+          direct bank transfer.
         </p>
 
-        <div className="grid gap-4">
-          <div className="bg-white border border-line rounded-md p-5">
-            <p className="text-sm font-semibold text-ink mb-2">Easypaisa</p>
-            <p className="text-sm text-slate">Account title: {EASYPAISA_TITLE}</p>
-            <p className="text-sm text-slate">Number: {EASYPAISA_NUMBER}</p>
-          </div>
-
-          <div className="bg-white border border-line rounded-md p-5">
-            <p className="text-sm font-semibold text-ink mb-2">JazzCash</p>
-            <p className="text-sm text-slate">Account title: {JAZZCASH_TITLE}</p>
-            <p className="text-sm text-slate">Number: {JAZZCASH_NUMBER}</p>
-          </div>
-
-          <div className="bg-white border border-line rounded-md p-5">
-            <p className="text-sm font-semibold text-ink mb-2">Bank transfer</p>
-            <p className="text-sm text-slate">Bank: {BANK_NAME}</p>
-            <p className="text-sm text-slate">Account title: {BANK_TITLE}</p>
-            <p className="text-sm text-slate">Account number: {BANK_ACCOUNT_NUMBER}</p>
-            <p className="text-sm text-slate">IBAN: {BANK_IBAN}</p>
-          </div>
+        <div className="bg-white border border-line rounded-md p-5 flex flex-col gap-1.5">
+          <p className="text-sm text-slate">Account title: <span className="text-ink font-medium">{ACCOUNT_TITLE}</span></p>
+          <p className="text-sm text-slate">Account number: <span className="text-ink font-medium">{ACCOUNT_NUMBER}</span></p>
+          <p className="text-sm text-slate">Bank: <span className="text-ink font-medium">{BANK_NAME}</span></p>
+          <p className="text-sm text-slate">IBAN (for bank transfer): <span className="text-ink font-medium">{BANK_IBAN}</span></p>
         </div>
       </section>
 
-      {/* Step 2 */}
       <section className="mb-10">
         <h2 className="text-lg font-semibold text-ink mb-4">Step 2 — Send us the details on WhatsApp</h2>
         <p className="text-sm text-slate mb-4">
@@ -101,7 +79,6 @@ function ContactContent() {
         </a>
       </section>
 
-      {/* Step 3 */}
       <section className="mb-10">
         <h2 className="text-lg font-semibold text-ink mb-4">Step 3 — Activation</h2>
         <p className="text-sm text-slate">
@@ -111,7 +88,6 @@ function ContactContent() {
         </p>
       </section>
 
-      {/* Rules */}
       <section className="bg-mist border border-line rounded-md p-6">
         <h2 className="text-sm font-semibold text-ink mb-3">Important account terms</h2>
         <ul className="text-sm text-slate space-y-2 list-disc list-inside">
