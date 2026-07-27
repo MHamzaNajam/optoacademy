@@ -1,8 +1,10 @@
 import Header from "@/components/marketing/Header";
 import Footer from "@/components/marketing/Footer";
+import Link from "next/link";
 
 const plans = [
   {
+    slug: "month1",
     name: "1 month",
     priceUsd: "$75",
     pricePkr: "PKR 20,000",
@@ -10,19 +12,21 @@ const plans = [
     features: ["Full DHA + MOH + HAAD + SCHFS + OMSB + NHRA question banks", "Unlimited mock exams", "Domain-level analytics"],
   },
   {
+    slug: "month3",
     name: "3 months",
     priceUsd: "$190",
     pricePkr: "PKR 50,000",
     period: "/ 3 months",
-    features: ["Everything for 3 months", "Best for a full prep cycle", "Priority content updates"],
+    features: ["Everything in 1 month", "Best for a full prep cycle", "Priority content updates"],
     featured: true,
   },
   {
+    slug: "month6",
     name: "6 months",
     priceUsd: "$300",
     pricePkr: "PKR 80,000",
     period: "/ 6 months",
-    features: ["Everything for 6 months", "Extended access for longer prep timelines", "Best value per month"],
+    features: ["Everything in 3 months", "Extended access for longer prep timelines", "Best value per month"],
   },
 ];
 
@@ -68,9 +72,12 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
-              <button className="bg-ink text-paper py-2.5 rounded-sm font-medium hover:bg-ink/90 transition">
+              <Link
+                href={`/contact?plan=${plan.slug}`}
+                className="bg-ink text-paper py-2.5 rounded-sm font-medium hover:bg-ink/90 transition text-center"
+              >
                 Choose {plan.name}
-              </button>
+              </Link>
             </div>
           ))}
         </div>
