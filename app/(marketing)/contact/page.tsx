@@ -15,10 +15,10 @@ const WHATSAPP_NUMBER = "+92 317 4297669";
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^0-9]/g, "")}`;
 const CONTACT_EMAIL = "optoacadmy1@gmail.com";
 
-const ACCOUNT_TITLE = "PLACEHOLDER — Account Title";
-const ACCOUNT_NUMBER = "PLACEHOLDER — Account Number (usable for Easypaisa, JazzCash, and bank transfer)";
-const BANK_NAME = "PLACEHOLDER — Bank Name";
-const BANK_IBAN = "PLACEHOLDER — IBAN";
+const ACCOUNT_TITLE = "RUBAB YASEEN";
+const ACCOUNT_NUMBER = "11257900818703";
+const BANK_NAME = "HBL";
+const BANK_IBAN = "PK58HABB0011257900818703";
 
 function ContactContent() {
   const searchParams = useSearchParams();
